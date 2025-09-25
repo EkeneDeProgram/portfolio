@@ -51,8 +51,8 @@ export default function ContactForm() {
   };
 
   return (
-      <div className=" bg-white/30 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl z-10">
-        <h2 className="text-2xl font-bold mb-6 text-center text-[#8B0000]">
+      <div className=" bg-white/30 text-[#000000] backdrop-blur-md rounded-3xl p-8 shadow-2xl z-10">
+        <h2 className="text-2xl font-bold mb-6 text-center text-[#FFD700]">
           Send Me a Message
         </h2>
 
@@ -64,12 +64,12 @@ export default function ContactForm() {
               name="user_name"
               type="text"
               placeholder=" "
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4B5320]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
               required
             />
             <label
               htmlFor="user_name"
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
+              className="absolute left-3 top-3 text-[#FFFFFF] dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
             >
               Your Name
             </label>
@@ -83,12 +83,12 @@ export default function ContactForm() {
               name="user_email"
               type="email"
               placeholder=" "
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4B5320]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
               required
             />
             <label
               htmlFor="user_email"
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
+              className="absolute left-3 top-3 text-[#FFFFFF] dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
             >
               Your Email
             </label>
@@ -102,12 +102,12 @@ export default function ContactForm() {
               name="message"
               placeholder=" "
               rows={6}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4B5320]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
               required
             />
             <label
               htmlFor="message"
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
+              className="absolute left-3 top-3 text-[#FFFFFF] dark:text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-blue-500 peer-focus:text-sm"
             >
               Message
             </label>
@@ -118,7 +118,7 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="w-full bg-[#4B5320] font-bold py-3 rounded-full shadow-lg hover:scale-105 transition-transform duration-300"
+            className="w-full bg-[#FFD700] font-bold py-3 rounded-full shadow-lg hover:scale-105 hover:bg-[#3B8B7E] transition-transform duration-300"
           >
             {status === "sending" ? "Sending..." : "Send"}
           </button>
