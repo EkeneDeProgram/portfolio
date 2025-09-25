@@ -7,9 +7,9 @@ export default function SkillsSection() {
   return (
     <section className="w-full py-16 px-6 sm:px-12 md:px-20  bg-white/30 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl z-10">
       <div className="max-w-6xl mx-auto space-y-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#8B0000] relative inline-block">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#FFD700] relative inline-block">
           Core Skills
-          <span className="absolute -bottom-2 left-0 w-16 h-1 bg-[#4B5320] rounded-full"></span>
+
         </h2>
 
         {/* Skill Categories */}
@@ -64,3 +64,5 @@ export default function SkillsSection() {
     </section>
   );
 }
+
+

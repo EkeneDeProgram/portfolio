@@ -9,10 +9,10 @@ interface SkillBadgeProps {
 
 export default function SkillBadge({ name, icon }: SkillBadgeProps) {
   return (
-    <div className="group relative flex items-center gap-2 px-4 py-2 bg-[#C2B280] text-[#000000] 
+    <div className="group relative flex items-center gap-2 px-4 py-2 bg-[#3B8B7E] text-[#000000] 
       rounded-full text-sm sm:text-base font-medium cursor-pointer 
       transform transition-all duration-300 shadow-sm hover:scale-105 hover:shadow-lg 
-      hover:border-[#8B0000] hover:text-[#8B0000] hover:bg-[#7D7F7D]">
+      hover:border-[#FFD700] hover:text-[#FFD700] hover:bg-[#7D7F7D]">
 
       {/* Icon with rotation effect */}
       <span className="text-xl transition-transform duration-500 group-hover:rotate-12">
