@@ -2,10 +2,12 @@ import HeroSection from "../components/home/HeroSection";
 
 export default function Home() {
   return (
-    <main className="bg-[#000000]">
+    <main className="min-h-screen w-full bg-black text-white overflow-x-hidden">
+      {/* Hero Section */}
       <HeroSection />
-      
-      {/* You can add more sections here: Projects, Skills, Contact */}
+
+      {/* Add more responsive sections here */}
     </main>
   );
 }
+

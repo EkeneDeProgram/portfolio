@@ -1,82 +1,73 @@
 "use client";
 
 import React from "react";
-import HighlightKeywords from "./HighlightKeywords";
-import Lottie from "lottie-react";
-import animationData from "@/public/animations/animation.json";
 import Link from "next/link";
-
-const keywords = [
-  { text: "frontend interfaces", color: "text-[#3B8B7E]" },
-  { text: "backend architectures", color: "text-[#4B5320]" },
-  { text: "cloud-native platforms", color: "text-[#336699]" },
-  { text: "data engineering", color: "text-[#4B5320]" },
-  { text: "machine learning", color: "text-[#3B8B7E]" }, // muted green
-  { text: "artificial intelligence (AI)", color: "text-[#336699]" }, // muted blue
-];
+import { Github, Linkedin, Mail } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 sm:px-16 lg:px-32 py-16 relative overflow-hidden bg-[#2F3E46] text-white">
+    <section className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-8 lg:px-24 py-20 bg-white text-gray-900">
       
-      {/* Left: Text */}
-      <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 z-10">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-[#FFD700]">
-          Hi, I’m Ekene Onyekachi
-        </h2>
+      {/* Headline */}
+      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center leading-tight max-w-4xl">
+        Ekene Onyekachi — Full-Stack Engineer{" "}
+        <span className="block text-lg sm:text-xl lg:text-2xl font-medium text-gray-600 mt-3">
+          (Python • Next.js • TypeScript)
+        </span>
+      </h1>
 
-        <HighlightKeywords keywords={keywords} />
+      {/* Sub Text */}
+      <p className="mt-6 text-base sm:text-lg lg:text-xl text-center max-w-3xl leading-relaxed text-gray-700">
+        I build scalable APIs, clean user interfaces, and intelligent automation tools.
+        I’ve led backend development for startups, built production-ready dashboards,
+        and developed real-world systems used by growing companies. I love solving
+        problems with code, product thinking, and clean engineering.
+      </p>
 
-        <p className="mt-4 text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl text-gray-100">
-          I specialize in designing and delivering high-performance solutions — from sleek{" "}
-          <span className="font-semibold text-[#FFD700]">frontend interfaces</span>{" "}
-          to resilient <span className="font-semibold text-[#3B8B7E]">backend architectures</span>{" "}
-          and <span className="font-semibold text-[#336699]">cloud-native platforms</span>. My{" "}
-          <span className="font-semibold text-[#FFD700]">data engineering</span> expertise extends to{" "}
-          <span className="font-semibold text-[#3B8B7E]">machine learning</span> and{" "}
-          <span className="font-semibold text-[#336699]">artificial intelligence (AI)</span>, where I build intelligent systems.
-        </p>
-
-        {/* CTA Button */}
-        <Link href="/contact" className="mt-4 inline-block px-6 py-3 bg-[#FFD700] text-[#2F3E46] font-semibold rounded-lg shadow-lg hover:bg-[#3B8B7E] transition">
-          Contact Me
+      {/* Buttons */}
+      <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
+        <Link
+          href="/projects"
+          className="px-6 py-3 w-full sm:w-auto text-center bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          View Projects
         </Link>
+
+        <a
+          href="/files/ekene-cv.pdf"
+          download
+          className="px-6 py-3 w-full sm:w-auto text-center bg-gray-900 text-white font-semibold rounded-lg shadow hover:bg-gray-800 transition"
+        >
+          Download CV
+        </a>
       </div>
 
-      {/* Right: Animation + Green Wave */}
-      <div className="flex-1 mt-12 md:mt-0 flex justify-center md:justify-end relative z-10">
-        <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72 rounded-lg shadow-2xl p-4 border border-white/20 overflow-hidden">
-          {/* Green wave background */}
-          <div className="absolute top-0 left-0 w-full h-full bg-[#4B5320] opacity-40 animate-wave"></div>
-          
-          {/* Lottie animation */}
-          <Lottie animationData={animationData} loop={true} autoplay={true} className="relative w-full h-full" />
-        </div>
+      {/* Secondary Links */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-gray-700">
+        <a
+          href="https://github.com/YOUR_GITHUB"
+          target="_blank"
+          className="flex items-center gap-2 hover:text-blue-600 transition"
+        >
+          <Github size={20} /> GitHub
+        </a>
+
+        <a
+          href="https://linkedin.com/in/YOUR_LINKEDIN"
+          target="_blank"
+          className="flex items-center gap-2 hover:text-blue-600 transition"
+        >
+          <Linkedin size={20} /> LinkedIn
+        </a>
+
+        <a
+          href="mailto:YOUR_EMAIL@example.com"
+          className="flex items-center gap-2 hover:text-blue-600 transition"
+        >
+          <Mail size={20} /> Email
+        </a>
       </div>
 
-      {/* Wave animation */}
-      <style jsx>{`
-        @keyframes wave {
-          0% { transform: translateX(-50%) rotate(0deg); }
-          50% { transform: translateX(50%) rotate(3deg); }
-          100% { transform: translateX(-50%) rotate(0deg); }
-        }
-        .animate-wave {
-          background: linear-gradient(
-            135deg,
-            #4b5320 0%,
-            #4b5320 25%,
-            #4b5320 50%,
-            #4b5320 75%,
-            #4b5320 100%
-          );
-          clip-path: polygon(
-            0% 60%, 10% 65%, 20% 55%, 30% 60%, 40% 50%,
-            50% 55%, 60% 45%, 70% 50%, 80% 40%, 90% 45%, 100% 35%, 100% 100%, 0% 100%
-          );
-          animation: wave 12s linear infinite; /* slower, smoother */
-        }
-      `}</style>
     </section>
   );
 };
