@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +32,6 @@ export default function RootLayout({
         
         {/* Main content grows to fill remaining space */}
         <main className="flex-grow pt-20">{children}</main>
-
-        <Footer /> {/* Footer sticks to bottom if content is short */}
       </body>
     </html>
   );
