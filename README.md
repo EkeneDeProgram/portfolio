@@ -42,7 +42,8 @@ portfolio/
 │ ├─ projects/page.tsx
 │ ├─ skills/page.tsx
 │ ├─ layout.tsx
-│ └─ globals.css
+│ ├─ globals.css
+│ └─ page.tsx
 ├─ components/
 │ ├─ Navbar.tsx
 │ ├─ blog/
