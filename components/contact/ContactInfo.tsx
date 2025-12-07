@@ -13,9 +13,15 @@ const ContactInfo: React.FC = () => {
         {/* Email */}
         <p className="flex items-center gap-3">
           <Mail className="text-blue-600" />
-          <a
+          {/* <a
             href="mailto:ekeneonyekachi1@gmail.com"
             className="hover:underline"
+          > */}
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=ekeneonyekachi1@gmail.com"
+            className="hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             ekeneonyekachi1@gmail.com
           </a>
@@ -44,12 +50,12 @@ const ContactInfo: React.FC = () => {
         <p className="flex items-center gap-3">
           <Linkedin className="text-blue-600" />
           <a
-            href="https://linkedin.com/in/your-profile"
+            href="https://linkedin.com/in/ekenedeprogram"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline"
           >
-            linkedin.com/in/your-profile
+            linkedin.com/in/ekenedeprogram
           </a>
         </p>
 

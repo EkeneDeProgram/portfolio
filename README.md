@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+A personal portfolio and project showcase built with **Next.js 15**, **React 19**, and **Tailwind CSS 4**. This project demonstrates modern web development practices, including component-based architecture, SEO optimization, and responsive design.
 
-First, run the development server:
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Available Scripts](#available-scripts)
+
+
+
+## Features
+
+- Responsive portfolio website with modern UI
+- Dedicated sections for **About**, **Projects**, **Skills**, **Blog**, and **Contact**
+- SEO-friendly pages using `next-seo`
+- Contact form integrated with `emailjs` for email submissions
+- Reusable and modular React components for maintainable code
+
+## Tech Stack
+
+- **Frontend:** Next.js 15, React 19, Tailwind CSS 4
+- **Styling:** Tailwind CSS, PostCSS, Autoprefixer
+- **Forms & Email:** EmailJS
+- **Animations:** Framer Motion, Lottie React
+- **Icons:** Lucide React, React Icons
+- **SEO:** next-seo
+- **Linting:** ESLint
+- **TypeScript:** Fully typed with TypeScript 5
+
+## Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+portfolio/
+├─ app/
+│ ├─ about/page.tsx
+│ ├─ blog/page.tsx
+│ ├─ contact/page.tsx
+│ ├─ projects/page.tsx
+│ ├─ skills/page.tsx
+│ ├─ layout.tsx
+│ └─ globals.css
+├─ components/
+│ ├─ Navbar.tsx
+│ ├─ blog/
+│ └─ contact/
+├─ public/
+├─ node_modules/
+├─ .env.local
+├─ package.json
+├─ tsconfig.json
+├─ tailwind.config.js
+└─ README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Clone the repository:
 
-## Learn More
+```bash
+git clone https://github.com/EkeneDeProgram/portfolio.git
+cd portfolio
+```
 
-To learn more about Next.js, take a look at the following resources:
+2. Install dependencies:
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Create a .env.local file in the root directory for environment variables, e.g., EmailJS keys:
+```bash
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Available Scripts
+```bash
+# Start development server
+npm run dev
 
-## Deploy on Vercel
+# Build the project
+npm run build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Start production server
+npm run start
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Run linter
+npm run lint
+```
