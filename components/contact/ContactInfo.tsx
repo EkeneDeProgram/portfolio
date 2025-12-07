@@ -1,31 +1,73 @@
-"user client";
+"use client";
 
-import { Mail, Phone, MapPin,} from "lucide-react";
-import React from "react"
-
+import { Mail, Phone, Github, Linkedin, FileText } from "lucide-react";
+import React from "react";
 
 const ContactInfo: React.FC = () => {
-    return (
-        <div className="space-y-8">
-            {/* Header */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#FFD700] text-center md:text-left">
-              Get in Touch
-            </h2>
+  return (
+    <div className="space-y-8">
 
-            {/* Contact Details */}
-            <div className="space-y-4 text-lg">
-                <p className="flex items-center gap-3">
-                    <Mail className="text-[#3B8B7E]" /> ekeneonyekachi1@gmail.com
-                </p>
-                <p className="flex items-center gap-3">
-                    <Phone className="text-[#3B8B7E]" /> (+234) 8115-503-343
-                </p>
-                <p className="flex items-center gap-3">
-                    <MapPin className="text-[#3B8B7E]" /> 8 Iyang Otop Street, Akim, Calabar, Cross River, Nigeria
-                </p>
-            </div>
-        </div>
-   );
+      {/* Contact Details */}
+      <div className="space-y-4 text-lg">
+
+        {/* Email */}
+        <p className="flex items-center gap-3">
+          <Mail className="text-blue-600" />
+          <a
+            href="mailto:ekeneonyekachi1@gmail.com"
+            className="hover:underline"
+          >
+            ekeneonyekachi1@gmail.com
+          </a>
+        </p>
+
+        {/* Phone */}
+        <p className="flex items-center gap-3">
+          <Phone className="text-blue-600" /> (+234) 9047-153-730
+        </p>
+
+
+        {/* GitHub */}
+        <p className="flex items-center gap-3">
+          <Github className="text-blue-600" />
+          <a
+            href="https://github.com/EkeneDeProgram"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            github.com/EkeneDeProgram
+          </a>
+        </p>
+
+        {/* LinkedIn */}
+        <p className="flex items-center gap-3">
+          <Linkedin className="text-blue-600" />
+          <a
+            href="https://linkedin.com/in/your-profile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            linkedin.com/in/your-profile
+          </a>
+        </p>
+
+        {/* Resume */}
+        <p className="flex items-center gap-3">
+          <FileText className="text-blue-600" />
+          <a
+            href="/resume.pdf"
+            download
+            className="hover:underline"
+          >
+            Download Resume (PDF)
+          </a>
+        </p>
+
+      </div>
+    </div>
+  );
 };
 
 export default ContactInfo;
