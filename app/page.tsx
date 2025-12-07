@@ -55,11 +55,6 @@ export default function Home() {
           >
             LinkedIn
           </a>
-
-          {/* <a
-            href="mailto:ekeneonyekachi1@gmail.com"
-            className="hover:text-black transition"
-          > */}
           <a
             href="https://mail.google.com/mail/?view=cm&fs=1&to=ekeneonyekachi1@gmail.com"
             className="hover:text-black transition"
