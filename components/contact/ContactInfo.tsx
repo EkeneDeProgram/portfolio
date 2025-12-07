@@ -23,7 +23,7 @@ const ContactInfo: React.FC = () => {
 
         {/* Phone */}
         <p className="flex items-center gap-3">
-          <Phone className="text-blue-600" /> (+234) 9047-153-730
+          <Phone className="text-blue-600" /> (+234) 9049-153-730
         </p>
 
 
