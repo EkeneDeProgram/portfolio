@@ -65,7 +65,7 @@ const projects = [
   {
     title: "CV Generator (Web App)",
     role: "Full-Stack Engineer",
-    tech: ["Node.js", "TypeScript", "Express", "React", "MongoDB"],
+    tech: ["Node.js", "TypeScript", "Express", "React"],
     description:
       "A web tool that helps users generate clean, professional CVs through a simple and interactive UI.",
     contributions: [
