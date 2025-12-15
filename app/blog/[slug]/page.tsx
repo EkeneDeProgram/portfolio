@@ -3,21 +3,10 @@ import { strapiQuery } from "@/lib/cms";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
-// TypeScript types
-type RichTextChild = {
-  text: string;
-  type: string;
-};
-
-type RichTextBlock = {
-  type: string;
-  children: RichTextChild[];
-};
-
-type FeaturedImage = {
-  url: string;
-  alternativeText?: string;
-};
+// Types
+type RichTextChild = { text: string; type: string };
+type RichTextBlock = { type: string; children: RichTextChild[] };
+type FeaturedImage = { url: string; alternativeText?: string };
 
 type Post = {
   documentId: string;
@@ -28,29 +17,42 @@ type Post = {
   featuredImage?: FeaturedImage;
 };
 
-type GetPostBySlugResponse = {
-  projectUpdates: Post[];
-};
-
 // GraphQL query
 const GET_POST_BY_SLUG = `
-  query ($slug: String!) {
-    projectUpdates(filters: { slug: { eq: $slug } }) {
-      documentId
-      title
-      content
-      createdAt
-      category
-      featuredImage {
-        url
-        alternativeText
-      }
-    }
+query ($slug: String!) {
+  projectUpdates(filters: { slug: { eq: $slug } }) {
+    documentId
+    title
+    content
+    createdAt
+    featuredImage { url alternativeText }
   }
+  careerGrowths(filters: { slug: { eq: $slug } }) {
+    documentId
+    title
+    content
+    createdAt
+    featuredImage { url alternativeText }
+  }
+  engineeringNotes(filters: { slug: { eq: $slug } }) {
+    documentId
+    title
+    content
+    createdAt
+    featuredImage { url alternativeText }
+  }
+}
 `;
 
-// Helper to render Strapi rich text blocks
-function renderRichText(blocks: RichTextBlock[]) {
+// Helpers
+function normalizeContent(content: RichTextBlock[] | string | undefined): RichTextBlock[] {
+  if (!content) return [];
+  if (Array.isArray(content)) return content;
+  return [{ type: "paragraph", children: [{ text: content, type: "text" }] }];
+}
+
+function renderRichText(content: RichTextBlock[] | string | undefined) {
+  const blocks = normalizeContent(content);
   return blocks
     .map((block) => {
       if (block.type === "paragraph") {
@@ -62,65 +64,70 @@ function renderRichText(blocks: RichTextBlock[]) {
     .join("");
 }
 
-// --- Props type ---
+// Props
 interface Props {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 }
 
+// Component
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
 
-  const data = await strapiQuery<GetPostBySlugResponse>(
-    GET_POST_BY_SLUG,
-    { slug }
-  );
+  const data = await strapiQuery<{
+    projectUpdates: Omit<Post, "category">[];
+    careerGrowths: Omit<Post, "category">[];
+    engineeringNotes: Omit<Post, "category">[];
+  }>(GET_POST_BY_SLUG, { slug });
 
-  const post = data.projectUpdates[0];
+  // Merge all collections with category labels
+  const allPosts: Post[] = [
+    ...data.projectUpdates.map((p) => ({ ...p, category: "Project Updates", content: normalizeContent(p.content) })),
+    ...data.careerGrowths.map((p) => ({ ...p, category: "Career Growth", content: normalizeContent(p.content) })),
+    ...data.engineeringNotes.map((p) => ({ ...p, category: "Engineering Notes", content: normalizeContent(p.content) })),
+  ];
 
+  const post = allPosts[0];
   if (!post) return notFound();
 
   return (
-    <article className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <article className="mx-auto w-full max-w-4xl px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-10 md:py-12 lg:py-14">
       {/* Category */}
       {post.category && (
-        <span className="inline-block text-xs sm:text-sm text-blue-600 font-semibold uppercase tracking-wide mb-3">
+        <span className="inline-block text-xs sm:text-sm md:text-base text-blue-600 font-semibold uppercase tracking-wide mb-3">
           {post.category}
         </span>
       )}
 
       {/* Title */}
-      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 sm:mb-6 md:mb-8">
         {post.title}
       </h1>
 
       {/* Date */}
-      <p className="text-gray-500 text-xs sm:text-sm mb-6">
+      <p className="text-gray-500 text-xs sm:text-sm md:text-base mb-6">
         {new Date(post.createdAt).toLocaleDateString()}
       </p>
 
       {/* Featured Image */}
       {post.featuredImage && (
-        <div className="relative w-full h-56 sm:h-72 md:h-96 lg:h-[420px] mb-8 rounded-xl overflow-hidden">
+        <div className="relative w-full h-48 sm:h-60 md:h-72 lg:h-[420px] mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden">
           <Image
             src={`http://localhost:1337${post.featuredImage.url}`}
             alt={post.featuredImage.alternativeText || post.title}
             fill
             priority
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 800px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 800px"
           />
         </div>
       )}
 
       {/* Content */}
       <div
-        className="prose prose-sm sm:prose-base lg:prose-lg max-w-none"
-        dangerouslySetInnerHTML={{
-          __html: renderRichText(post.content),
-        }}
+        className="prose prose-sm sm:prose-base md:prose-lg lg:prose-xl max-w-full"
+        dangerouslySetInnerHTML={{ __html: renderRichText(post.content) }}
       />
     </article>
   );
 }
+

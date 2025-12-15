@@ -1,8 +1,11 @@
-import Link from "next/link";
-import Image from "next/image";
+// /blog/page.tsx
 import { strapiQuery } from "@/lib/cms";
+import BlogLayout from "@/components/blog/BlogLayout";
+import BlogCategoryTabs from "@/components/blog/BlogCategoryTabs";
+import BlogPostCard from "@/components/blog/BlogPostCard";
+import BlogEmptyState from "@/components/blog/BlogEmptyState";
 
-// TypeScript types for Strapi posts
+// Types
 type RichTextChild = { text: string; type: string };
 type RichTextBlock = { type: string; children: RichTextChild[] };
 
@@ -13,10 +16,10 @@ type Post = {
   createdAt: string;
   content: RichTextBlock[];
   featuredImage?: { url: string; alternativeText?: string };
-  category?: string;
+  category: string;      // Display label
+  categorySlug: string;  // URL slug
+  excerpt: string;
 };
-
-type GetAllPostsResponse = { projectUpdates: Post[] };
 
 // GraphQL query
 const GET_ALL_POSTS = `
@@ -27,91 +30,108 @@ const GET_ALL_POSTS = `
       slug
       createdAt
       content
-      featuredImage {
-        url
-        alternativeText
-      }
-      category
+      featuredImage { url alternativeText }
+    }
+    careerGrowths(sort: "createdAt:desc") {
+      documentId
+      title
+      slug
+      createdAt
+      content
+      featuredImage { url alternativeText }
+    }
+    engineeringNotes(sort: "createdAt:desc") {
+      documentId
+      title
+      slug
+      createdAt
+      content
+      featuredImage { url alternativeText }
     }
   }
 `;
 
-// Strip HTML from Strapi text
+// Helpers
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, "");
 }
 
-// Generate clean excerpt
-function getExcerpt(content: Post["content"], length = 140) {
-  if (!content?.length) return "";
-
-  const text = content
-    .flatMap((block) => block.children)
-    .map((child) => stripHtml(child.text))
-    .join(" ");
-
-  if (text.length <= length) return text;
-
-  return text.slice(0, text.lastIndexOf(" ", length)) + "…";
+function normalizeContent(content: RichTextBlock[] | string): RichTextBlock[] {
+  if (!content) return [];
+  if (Array.isArray(content)) return content;
+  return [{ type: "paragraph", children: [{ text: content, type: "text" }] }];
 }
 
+function getExcerpt(content: RichTextBlock[] | string, length = 140) {
+  const blocks = normalizeContent(content);
+  const text = blocks.flatMap(b => b.children).map(c => stripHtml(c.text)).join(" ");
+  return text.length <= length ? text : text.slice(0, text.lastIndexOf(" ", length)) + "…";
+}
+
+// Component
 export default async function BlogPage() {
-  const data = await strapiQuery<GetAllPostsResponse>(GET_ALL_POSTS);
-  const posts = data.projectUpdates;
+  const data = await strapiQuery<{
+    projectUpdates: { documentId: string; title: string; slug: string; createdAt: string; content: RichTextBlock[] | string; featuredImage?: { url: string; alternativeText?: string }; }[];
+    careerGrowths: { documentId: string; title: string; slug: string; createdAt: string; content: RichTextBlock[] | string; featuredImage?: { url: string; alternativeText?: string }; }[];
+    engineeringNotes: { documentId: string; title: string; slug: string; createdAt: string; content: RichTextBlock[] | string; featuredImage?: { url: string; alternativeText?: string }; }[];
+  }>(GET_ALL_POSTS);
+
+  const posts: Post[] = [
+    ...data.projectUpdates.map(p => ({
+      documentId: p.documentId,
+      title: p.title,
+      slug: p.slug,
+      createdAt: p.createdAt,
+      content: normalizeContent(p.content),
+      featuredImage: p.featuredImage,
+      category: "Project Updates",
+      categorySlug: "project-updates",
+      excerpt: getExcerpt(p.content),
+    })),
+    ...data.careerGrowths.map(p => ({
+      documentId: p.documentId,
+      title: p.title,
+      slug: p.slug,
+      createdAt: p.createdAt,
+      content: normalizeContent(p.content),
+      featuredImage: p.featuredImage,
+      category: "Career Growth",
+      categorySlug: "career-growth",
+      excerpt: getExcerpt(p.content),
+    })),
+    ...data.engineeringNotes.map(p => ({
+      documentId: p.documentId,
+      title: p.title,
+      slug: p.slug,
+      createdAt: p.createdAt,
+      content: normalizeContent(p.content),
+      featuredImage: p.featuredImage,
+      category: "Engineering Notes",
+      categorySlug: "engineering-notes",
+      excerpt: getExcerpt(p.content),
+    })),
+  ];
+
+  posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10">
+    <BlogLayout>
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 md:mb-10">
         Blog
       </h1>
 
-      <ul className="space-y-10">
-        {posts.map((post) => (
-          <li
-            key={post.documentId}
-            className="group grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-6 pb-8 border-b last:border-b-0"
-          >
-            {/* Image */}
-            {post.featuredImage && (
-              <div className="relative w-full h-52 sm:h-40 md:h-44 lg:h-48 rounded-xl overflow-hidden bg-gray-100">
-                <Image
-                  src={`http://localhost:1337${post.featuredImage.url}`}
-                  alt={post.featuredImage.alternativeText || post.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, 220px"
-                />
-              </div>
-            )}
+      <BlogCategoryTabs active="all" />
 
-            {/* Content */}
-            <div className="flex flex-col justify-between">
-              <div>
-                {post.category && (
-                  <span className="text-xs sm:text-sm text-blue-600 font-semibold uppercase tracking-wide">
-                    {post.category}
-                  </span>
-                )}
-
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="block mt-1 text-xl sm:text-2xl font-bold leading-snug hover:text-blue-700 transition-colors"
-                >
-                  {post.title}
-                </Link>
-
-                <p className="mt-3 text-sm sm:text-base text-gray-600 line-clamp-3">
-                  {getExcerpt(post.content)}
-                </p>
-              </div>
-
-              <time className="mt-4 text-xs sm:text-sm text-gray-500">
-                {new Date(post.createdAt).toLocaleDateString()}
-              </time>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </main>
+      {posts.length === 0 ? (
+        <BlogEmptyState message="No posts available." />
+      ) : (
+        <ul className="space-y-8 sm:space-y-10 mt-4 sm:mt-6">
+          {posts.map(post => (
+            <BlogPostCard key={post.documentId} post={post} />
+          ))}
+        </ul>
+      )}
+    </BlogLayout>
   );
 }
+

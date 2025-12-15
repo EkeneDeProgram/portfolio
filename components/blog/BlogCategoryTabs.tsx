@@ -7,22 +7,18 @@ const categories = [
   { label: "Project Updates", slug: "project-updates" },
 ];
 
-export default function BlogCategoryTabs({
-  active,
-}: {
+interface BlogCategoryTabsProps {
   active: string;
-}) {
+}
+
+export default function BlogCategoryTabs({ active }: BlogCategoryTabsProps) {
   return (
-    <nav className="flex flex-wrap gap-3 mb-10">
+    <nav className="flex flex-wrap gap-2 sm:gap-3 mb-10">
       {categories.map((cat) => (
         <Link
           key={cat.slug}
-          href={
-            cat.slug === "all"
-              ? "/blog"
-              : `/blog/category/${cat.slug}`
-          }
-          className={`px-4 py-2 rounded-full text-sm font-medium border transition
+          href={cat.slug === "all" ? "/blog" : `/blog/category/${cat.slug}`}
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium border transition
             ${
               active === cat.slug
                 ? "bg-blue-600 text-white border-blue-600"
