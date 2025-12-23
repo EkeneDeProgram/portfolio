@@ -2,6 +2,7 @@
 import { strapiQuery } from "@/lib/cms";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 // Types
 type RichTextChild = { text: string; type: string };
@@ -14,10 +15,11 @@ type Post = {
   content: RichTextBlock[];
   createdAt: string;
   category?: string;
+  categorySlug?: string;
   featuredImage?: FeaturedImage;
 };
 
-// GraphQL query
+// GraphQL Query
 const GET_POST_BY_SLUG = `
 query ($slug: String!) {
   projectUpdates(filters: { slug: { eq: $slug } }) {
@@ -45,14 +47,25 @@ query ($slug: String!) {
 `;
 
 // Helpers
-function normalizeContent(content: RichTextBlock[] | string | undefined): RichTextBlock[] {
+function normalizeContent(
+  content: RichTextBlock[] | string | undefined
+): RichTextBlock[] {
   if (!content) return [];
   if (Array.isArray(content)) return content;
-  return [{ type: "paragraph", children: [{ text: content, type: "text" }] }];
+
+  return [
+    {
+      type: "paragraph",
+      children: [{ text: content, type: "text" }],
+    },
+  ];
 }
 
-function renderRichText(content: RichTextBlock[] | string | undefined) {
+function renderRichText(
+  content: RichTextBlock[] | string | undefined
+) {
   const blocks = normalizeContent(content);
+
   return blocks
     .map((block) => {
       if (block.type === "paragraph") {
@@ -69,21 +82,36 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Component
+// Page Component
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
 
   const data = await strapiQuery<{
-    projectUpdates: Omit<Post, "category">[];
-    careerGrowths: Omit<Post, "category">[];
-    engineeringNotes: Omit<Post, "category">[];
+    projectUpdates: Omit<Post, "category" | "categorySlug">[];
+    careerGrowths: Omit<Post, "category" | "categorySlug">[];
+    engineeringNotes: Omit<Post, "category" | "categorySlug">[];
   }>(GET_POST_BY_SLUG, { slug });
 
-  // Merge all collections with category labels
+  // Merge collections and attach category metadata
   const allPosts: Post[] = [
-    ...data.projectUpdates.map((p) => ({ ...p, category: "Project Updates", content: normalizeContent(p.content) })),
-    ...data.careerGrowths.map((p) => ({ ...p, category: "Career Growth", content: normalizeContent(p.content) })),
-    ...data.engineeringNotes.map((p) => ({ ...p, category: "Engineering Notes", content: normalizeContent(p.content) })),
+    ...data.projectUpdates.map((p) => ({
+      ...p,
+      category: "Project Updates",
+      categorySlug: "project-updates",
+      content: normalizeContent(p.content),
+    })),
+    ...data.careerGrowths.map((p) => ({
+      ...p,
+      category: "Career Growth",
+      categorySlug: "career-growth",
+      content: normalizeContent(p.content),
+    })),
+    ...data.engineeringNotes.map((p) => ({
+      ...p,
+      category: "Engineering Notes",
+      categorySlug: "engineering-notes",
+      content: normalizeContent(p.content),
+    })),
   ];
 
   const post = allPosts[0];
@@ -91,9 +119,21 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <article className="mx-auto w-full max-w-4xl px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-10 md:py-12 lg:py-14">
+
+      {/* Back to category */}
+      {post.categorySlug && (
+        <Link
+          href={`/blog/category/${post.categorySlug}`}
+          className="inline-flex items-center gap-2 text-sm sm:text-base text-gray-600 hover:text-blue-600 transition-colors mb-6"
+        >
+          <span className="text-lg leading-none">←</span>
+          <span>Back to {post.category}</span>
+        </Link>
+      )}
+
       {/* Category */}
       {post.category && (
-        <span className="inline-block text-xs sm:text-sm md:text-base text-blue-600 font-semibold uppercase tracking-wide mb-3">
+        <span className="block text-xs sm:text-sm md:text-base text-blue-600 font-semibold uppercase tracking-wide mb-3">
           {post.category}
         </span>
       )}
@@ -125,7 +165,9 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Content */}
       <div
         className="prose prose-sm sm:prose-base md:prose-lg lg:prose-xl max-w-full"
-        dangerouslySetInnerHTML={{ __html: renderRichText(post.content) }}
+        dangerouslySetInnerHTML={{
+          __html: renderRichText(post.content),
+        }}
       />
     </article>
   );
