@@ -1,4 +1,4 @@
-// /category/[category]/page.tsx
+// app/blog/category/[category]/page.tsx
 import { strapiQuery } from "@/lib/cms";
 import BlogLayout from "@/components/blog/BlogLayout";
 import BlogPostCard from "@/components/blog/BlogPostCard";

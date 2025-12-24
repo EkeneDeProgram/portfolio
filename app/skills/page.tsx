@@ -66,7 +66,6 @@ const SkillsPage = () => {
       ],
     },
 
-    // ➕ NEW CATEGORY HERE
     {
       title: "Other",
       skills: [
