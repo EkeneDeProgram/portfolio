@@ -3,49 +3,69 @@ import { NewsItem, NewsCategory } from "./types";
 
 const API_KEY = process.env.NEWS_API_KEY!;
 const BASE_URL = process.env.NEWS_API_URL!;
+const CRYPTO_URL = process.env.CRYPTO_URL!;
 
-
-//  Source-based categories (NewsAPI-friendly)
+// Source-based categories (best for NewsAPI headlines)
 const SOURCE_CATEGORIES: Partial<Record<NewsCategory, string>> = {
   tech: "techcrunch,the-verge,wired,ars-technica",
   finance: "bloomberg,reuters,financial-times,wall-street-journal",
 };
 
-
-// Query-based keywords (reliable for crypto)
+// Query-based categories
 const QUERY_CATEGORIES: Record<NewsCategory, string> = {
   tech: "technology",
-  finance: "finance OR markets",
-  crypto: "crypto OR bitcoin OR blockchain OR ethereum",
+  finance: "finance",
+  crypto: "bitcoin OR crypto OR blockchain OR ethereum",
 };
 
-// Fetch news for a single category with ISR
+// Fetch news for a single category
 async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   const sources = SOURCE_CATEGORIES[category];
   const query = QUERY_CATEGORIES[category];
 
-  const url = sources
-    ? `${BASE_URL}?sources=${sources}&pageSize=10&language=en&apiKey=${API_KEY}`
-    : `${BASE_URL}?q=${encodeURIComponent(
-        query
-      )}&pageSize=10&language=en&sortBy=publishedAt&apiKey=${API_KEY}`;
+  // Crypto MUST use /everything
+  const url =
+    category === "crypto"
+      ? `${CRYPTO_URL}?q=${encodeURIComponent(
+          query
+        )}&pageSize=10&language=en&sortBy=publishedAt&apiKey=${API_KEY}`
+      : sources
+      ? `${BASE_URL}?sources=${sources}&pageSize=10&language=en&sortBy=publishedAt&apiKey=${API_KEY}`
+      : `${BASE_URL}?q=${encodeURIComponent(
+          query
+        )}&pageSize=10&language=en&sortBy=publishedAt&apiKey=${API_KEY}`;
+
+  if (category === "crypto") {
+    console.log("[Crypto News] Fetching from /everything endpoint");
+  }
 
   const res = await fetch(url, {
-    next: {
-      revalidate: 60 * 60 * 8, // 8 hours
-      tags: [`news-${category}`],
-    },
+    // Never cache crypto
+    cache: category === "crypto" ? "no-store" : undefined,
+    next:
+      category === "crypto"
+        ? undefined
+        : {
+            revalidate: 60 * 60 * 8, // 8 hours
+            tags: [`news-${category}`],
+          },
   });
 
   if (!res.ok) {
-    console.error(`NewsAPI failed for ${category}`);
+    console.error(`[NewsAPI] Failed for ${category}`);
     return [];
   }
 
   const data = await res.json();
+
+  if (category === "crypto") {
+    console.log(
+      `[Crypto News] Articles received: ${data.articles?.length ?? 0}`
+    );
+  }
+
   return normalizeNews(data.articles || [], category);
 }
-
 
 // Remove duplicate articles across categories
 function dedupeByUrl(items: NewsItem[]): NewsItem[] {
@@ -59,7 +79,9 @@ function dedupeByUrl(items: NewsItem[]): NewsItem[] {
 }
 
 // Get top news grouped by category
-export async function getTopNews(): Promise<Record<NewsCategory, NewsItem[]>> {
+export async function getTopNews(): Promise<
+  Record<NewsCategory, NewsItem[]>
+> {
   const [tech, finance, crypto] = await Promise.all([
     fetchCategory("tech"),
     fetchCategory("finance"),
