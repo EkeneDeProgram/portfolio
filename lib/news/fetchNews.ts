@@ -5,7 +5,7 @@ const API_KEY = process.env.NEWS_API_KEY!;
 const BASE_URL = process.env.NEWS_API_URL!;
 const CRYPTO_URL = process.env.CRYPTO_URL!;
 
-// Source-based categories (best for NewsAPI headlines)
+// Source-based categories (NewsAPI sources)
 const SOURCE_CATEGORIES: Partial<Record<NewsCategory, string>> = {
   tech: "techcrunch,the-verge,wired,ars-technica",
   finance: "bloomberg,reuters,financial-times,wall-street-journal",
@@ -23,7 +23,7 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   const sources = SOURCE_CATEGORIES[category];
   const query = QUERY_CATEGORIES[category];
 
-  // Crypto MUST use /everything
+  // Use /everything for crypto, sources for others
   const url =
     category === "crypto"
       ? `${CRYPTO_URL}?q=${encodeURIComponent(
@@ -37,22 +37,20 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
 
   if (category === "crypto") {
     console.log("[Crypto News] Fetching from /everything endpoint");
+  } else {
+    console.log(`[NewsAPI] Fetching ${category} news from ${url}`);
   }
 
   const res = await fetch(url, {
-    // Never cache crypto
-    cache: category === "crypto" ? "no-store" : undefined,
-    next:
-      category === "crypto"
-        ? undefined
-        : {
-            revalidate: 60 * 60 * 8, // 8 hours
-            tags: [`news-${category}`],
-          },
+    cache: "force-cache", // cache all categories
+    next: {
+      revalidate: 60 * 60 * 8, // 8 hours
+      tags: [`news-${category}`],
+    },
   });
 
   if (!res.ok) {
-    console.error(`[NewsAPI] Failed for ${category}`);
+    console.error(`[NewsAPI] Failed for ${category}: ${res.status}`);
     return [];
   }
 
@@ -67,10 +65,9 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   return normalizeNews(data.articles || [], category);
 }
 
-// Remove duplicate articles across categories
+// Remove duplicate articles based on URL
 function dedupeByUrl(items: NewsItem[]): NewsItem[] {
   const seen = new Set<string>();
-
   return items.filter((item) => {
     if (seen.has(item.url)) return false;
     seen.add(item.url);
@@ -79,9 +76,7 @@ function dedupeByUrl(items: NewsItem[]): NewsItem[] {
 }
 
 // Get top news grouped by category
-export async function getTopNews(): Promise<
-  Record<NewsCategory, NewsItem[]>
-> {
+export async function getTopNews(): Promise<Record<NewsCategory, NewsItem[]>> {
   const [tech, finance, crypto] = await Promise.all([
     fetchCategory("tech"),
     fetchCategory("finance"),
@@ -94,3 +89,4 @@ export async function getTopNews(): Promise<
     crypto: dedupeByUrl(crypto).slice(0, 10),
   };
 }
+
