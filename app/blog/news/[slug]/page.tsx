@@ -1,11 +1,10 @@
-// app/blog/news/[slug]/page.tsx
-
-
 import { getTopNews } from "@/lib/news/fetchNews";
 import BlogLayout from "@/components/blog/BlogLayout";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+
 
 // Helpers
 const slugify = (text: string) =>
@@ -74,7 +73,7 @@ export default async function NewsSlugPage({ params }: Props) {
             src={article.image || "/images/news-fallback.jpg"}
             alt={article.title}
             fill
-            unoptimized // ✅ fixes external domain issues
+            unoptimized // fixes external domain issues
             className="object-cover"
           />
         </div>

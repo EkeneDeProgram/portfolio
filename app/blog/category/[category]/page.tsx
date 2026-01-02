@@ -5,6 +5,37 @@ import BlogPostCard from "@/components/blog/BlogPostCard";
 import BlogCategoryTabs from "@/components/blog/BlogCategoryTabs";
 import BlogEmptyState from "@/components/blog/BlogEmptyState";
 
+import { Metadata } from "next";
+
+// Blog page SEO metadata
+export const metadata: Metadata = {
+  title: "Blog post | Ekene Onyekachi",
+  description:
+    "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates.",
+  openGraph: {
+    title: "Blog | Ekene Onyekachi",
+    description:
+      "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates.",
+    type: "website",
+    url: "https://yourdomain.com/blog",
+    siteName: "Ekene Onyekachi Portfolio",
+    images: [
+      {
+        url: "https://yourdomain.com/og-blog.png",
+        width: 1200,
+        height: 630,
+        alt: "Blog & News by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram",
+  },
+};
+
+
 // Types
 type RichTextChild = { text: string; type: string };
 type RichTextBlock = { type: string; children: RichTextChild[] };

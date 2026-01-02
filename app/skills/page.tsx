@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import React from "react";
 import Head from "next/head";
 import {
@@ -21,6 +22,37 @@ import {
   SiNestjs,
   SiPostgresql,
 } from "react-icons/si";
+
+
+
+
+export const metadata: Metadata = {
+  title: "My Skills | Ekene Onyekachi",
+  description:
+    "Discover the technical skills and expertise of Ekene Onyekachi, including Python, Next.js, TypeScript, API development, and full-stack engineering.",
+  openGraph: {
+    title: "My Skills | Ekene Onyekachi",
+    description:
+      "Discover the technical skills and expertise of Ekene Onyekachi, including Python, Next.js, TypeScript, API development, and full-stack engineering.",
+    type: "website",
+    url: "https://yourdomain.com/projects",
+    siteName: "Ekene Onyekachi Portfolio", 
+    images: [
+      {
+        url: "https://yourdomain.com/og-projects.png",
+        width: 1200,
+        height: 630,
+        alt: "Projects by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image", 
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram",
+  },
+};
+
 
 const SkillsPage = () => {
   const skillCategories = [

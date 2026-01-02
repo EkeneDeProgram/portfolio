@@ -1,11 +1,35 @@
 import { Metadata } from "next";
 import { Code, Boxes, Cpu, Wrench } from "lucide-react";
 
+
+
 export const metadata: Metadata = {
   title: "About Me | Ekene Onyekachi",
   description:
-    "Learn more about Ekene Onyekachi, a Full-Stack Engineer specializing in Python, TypeScript, Next.js, automation, and scalable API development.",
+   "Learn more about Ekene Onyekachi, a Full-Stack Engineer specializing in Python, TypeScript, Next.js, automation, and scalable API development.",
+  openGraph: {
+    title: "About Me | Ekene Onyekachi",
+    description:
+      "Learn more about Ekene Onyekachi, a Full-Stack Engineer specializing in Python, TypeScript, Next.js, automation, and scalable API development.",
+    type: "website",
+    url: "https://yourdomain.com/projects",
+    siteName: "Ekene Onyekachi Portfolio", 
+    images: [
+      {
+        url: "https://yourdomain.com/og-projects.png",
+        width: 1200,
+        height: 630,
+        alt: "Projects by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image", 
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram", 
+  },
 };
+
 
 export default function About() {
   return (

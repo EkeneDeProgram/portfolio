@@ -1,8 +1,38 @@
-// app/blog/[slug]/page.tsx
 import { strapiQuery } from "@/lib/cms";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+
+// Blog page SEO metadata
+export const metadata: Metadata = {
+  title: "Blog post | Ekene Onyekachi",
+  description:
+    "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates.",
+  openGraph: {
+    title: "Blog | Ekene Onyekachi",
+    description:
+      "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates.",
+    type: "website",
+    url: "https://yourdomain.com/blog",
+    siteName: "Ekene Onyekachi Portfolio",
+    images: [
+      {
+        url: "https://yourdomain.com/og-blog.png",
+        width: 1200,
+        height: 630,
+        alt: "Blog & News by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram",
+  },
+};
+
 
 // Types
 type RichTextChild = { text: string; type: string };

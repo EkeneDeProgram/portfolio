@@ -1,11 +1,36 @@
 import React from "react";
 import ContactInfo from "@/components/contact/ContactInfo";
 import ContactForm from "@/components/contact/ContactForm";
+import { Metadata } from "next";
 
-export const metadata = {
+
+export const metadata: Metadata = {
   title: "Contact | Ekene Onyekachi",
-  description: "Get in touch with me via my portfolio contact form.",
+  description:
+    "Get in touch with me via my portfolio contact form.",
+  openGraph: {
+    title: "Contact | Ekene Onyekachi",
+    description:
+      "Get in touch with me via my portfolio contact form.",
+    type: "website",
+    url: "https://yourdomain.com/projects",
+    siteName: "Ekene Onyekachi Portfolio", 
+    images: [
+      {
+        url: "https://yourdomain.com/og-projects.png",
+        width: 1200,
+        height: 630,
+        alt: "Projects by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image", 
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram", 
+  },
 };
+
 
 const ContactMe: React.FC = () => {
   return (

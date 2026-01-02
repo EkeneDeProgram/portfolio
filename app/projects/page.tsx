@@ -1,6 +1,37 @@
+import { Metadata } from "next";
 import React from "react";
 import { ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
+
+
+
+export const metadata: Metadata = {
+  title: "My Projects | Ekene Onyekachi",
+  description:
+    "Explore real-world projects built by Ekene Onyekachi, showcasing full-stack development, Python, Next.js, and TypeScript expertise.",
+  openGraph: {
+    title: "My Projects | Ekene Onyekachi",
+    description:
+      "Explore real-world projects built by Ekene Onyekachi, showcasing full-stack development, Python, Next.js, and TypeScript expertise.",
+    type: "website",
+    url: "https://yourdomain.com/projects",
+    siteName: "Ekene Onyekachi Portfolio", 
+    images: [
+      {
+        url: "https://yourdomain.com/og-projects.png",
+        width: 1200,
+        height: 630,
+        alt: "Projects by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image", 
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram",
+  },
+};
+
 
 const projects = [
   {

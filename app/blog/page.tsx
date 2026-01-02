@@ -1,5 +1,3 @@
-// app/blog/page.tsx
-
 import { strapiQuery } from "@/lib/cms";
 import { getTopNews } from "@/lib/news/fetchNews";
 import { UnifiedItem } from "@/lib/blog/unified";
@@ -8,6 +6,37 @@ import BlogLayout from "@/components/blog/BlogLayout";
 import BlogContentTypeTabs from "@/components/blog/BlogContentTypeTabs";
 import UnifiedCard from "@/components/blog/UnifiedCard";
 import BlogEmptyState from "@/components/blog/BlogEmptyState";
+
+import { Metadata } from "next";
+
+// Blog page SEO metadata
+export const metadata: Metadata = {
+  title: "Blog post & News | Ekene Onyekachi",
+  description:
+    "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates, and curated tech & crypto news.",
+  openGraph: {
+    title: "Blog post & News | Ekene Onyekachi",
+    description:
+      "Stay updated with Ekene Onyekachi's latest blog posts, engineering notes, career growth insights, project updates, and curated tech & crypto news.",
+    type: "website",
+    url: "https://yourdomain.com/blog",
+    siteName: "Ekene Onyekachi Portfolio",
+    images: [
+      {
+        url: "https://yourdomain.com/og-blog.png",
+        width: 1200,
+        height: 630,
+        alt: "Blog & News by Ekene Onyekachi",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@EkeneDeProgram",
+    creator: "@EkeneDeProgram",
+  },
+};
+
 
 // Types
 type RichTextChild = { text: string; type: string };
