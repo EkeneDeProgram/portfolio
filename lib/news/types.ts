@@ -11,6 +11,7 @@ export type NewsItem = {
   source: string;
   publishedAt: string;
   category: NewsCategory;
+  summary?: string;
 };
 
 // Raw API Response Shape (external, untrusted data)

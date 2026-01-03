@@ -32,7 +32,7 @@ export default function RootLayout({
         <Navbar />
         
         {/* Main content grows to fill remaining space */}
-        <main className="flex-grow pt-20">{children}</main>
+        <main className="grow pt-20">{children}</main>
       </body>
     </html>
   );
