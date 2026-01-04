@@ -6,8 +6,20 @@ const API_KEY = process.env.NEWS_API_KEY!;
 const BASE_URL = process.env.NEWS_API_URL!;
 const CRYPTO_URL = process.env.CRYPTO_URL!;
 
+// TYPES
+type EnrichedNewsItem = NewsItem & {
+  isFresh: boolean;
+  feedType: "breaking" | "trending";
+};
 
-// UPSTASH REST REDIS CLIENT (serverless-safe, disabled in dev)
+// DEBUG LOGGER (dev only)
+function log(stage: string, data: unknown) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[news:${stage}]`, data);
+  }
+}
+
+//  UPSTASH REDIS (disabled in dev)
 let redis: Redis | null = null;
 if (
   process.env.NODE_ENV !== "development" &&
@@ -58,16 +70,18 @@ function sourceScore(source: string, category: NewsCategory): number {
     if (TRUSTED_CRYPTO_SOURCES.some((p) => s.includes(p))) return 120;
     return 20;
   }
-  if (["reuters", "bloomberg", "financial times", "wall street journal"].some((p) =>
+  if (
+    ["reuters", "bloomberg", "financial times", "wall street journal"].some((p) =>
       s.includes(p)
-    ))
+    )
+  )
     return 100;
   if (["the verge", "wired", "techcrunch"].some((p) => s.includes(p)))
     return 80;
   return 50;
 }
 
-// NORMALIZATION + DEDUPLICATION
+// NORMALIZATION + DEDUPE
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
@@ -81,7 +95,6 @@ function fingerprint(item: NewsItem): string {
   return normalizeText(`${item.title} ${item.description ?? ""}`);
 }
 
-// Deduplicate within a category
 function dedupeCanonical(items: NewsItem[]): NewsItem[] {
   const map = new Map<string, NewsItem>();
   for (const item of items) {
@@ -93,35 +106,27 @@ function dedupeCanonical(items: NewsItem[]): NewsItem[] {
     }
     const scoreA = sourceScore(item.source, item.category);
     const scoreB = sourceScore(existing.source, existing.category);
-    if (scoreA > scoreB || (scoreA === scoreB && new Date(item.publishedAt) < new Date(existing.publishedAt))) {
+    if (
+      scoreA > scoreB ||
+      (scoreA === scoreB &&
+        new Date(item.publishedAt) < new Date(existing.publishedAt))
+    ) {
       map.set(key, item);
     }
   }
   return Array.from(map.values());
 }
 
-// Deduplicate across categories
-function dedupeAcrossCategories(items: NewsItem[]): NewsItem[] {
-  const seen = new Map<string, Set<string>>(); // fingerprint -> set of categories
+function dedupeAcrossCategories(items: EnrichedNewsItem[]): EnrichedNewsItem[] {
+  const seen = new Map<string, Set<string>>();
   return items.filter((item) => {
     const key = fingerprint(item);
     const cats = seen.get(key) || new Set();
-    if (cats.has(item.category)) return false; // already in this category
+    if (cats.has(item.category)) return false;
     cats.add(item.category);
     seen.set(key, cats);
     return true;
   });
-}
-
-// SERVER-SIDE REJECTION LOGGING
-function logRejection(reason: string, article: RawNewsArticle) {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(`[NEWS REJECTED] ${reason}`, {
-      title: article.title,
-      source: article.source?.name,
-      url: article.url,
-    });
-  }
 }
 
 // FETCH CATEGORY
@@ -129,103 +134,165 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   const sources = SOURCE_CATEGORIES[category];
   const query = QUERY_CATEGORIES[category];
 
-  // Use query for crypto, sources for others
   const url =
     category === "crypto"
-      ? `${CRYPTO_URL}?q=${encodeURIComponent(query)}&pageSize=20&language=en&sortBy=publishedAt&apiKey=${API_KEY}`
+      ? `${CRYPTO_URL}?q=${encodeURIComponent(
+          query
+        )}&pageSize=20&language=en&sortBy=publishedAt&apiKey=${API_KEY}`
       : `${BASE_URL}?sources=${sources}&pageSize=20&language=en&sortBy=publishedAt&apiKey=${API_KEY}`;
+
+  log(`${category}:fetch:url`, url);
 
   const res = await fetch(url, {
     cache: "force-cache",
     next: { revalidate: 60 * 60 * 8, tags: [`news-${category}`] },
   });
 
+  log(`${category}:fetch:status`, res.status);
+
   if (!res.ok) {
-    console.error(`[NewsAPI] ${category} failed: ${res.status}`);
+    const errorText = await res.text();
+    log(`${category}:fetch:error`, errorText);
     return [];
   }
 
-  let articles: RawNewsArticle[] = (await res.json()).articles || [];
+  const json = await res.json();
+  let articles: RawNewsArticle[] = json.articles || [];
+
+  log(`${category}:raw:count`, articles.length);
 
   if (category === "crypto") {
-    articles = articles.filter((a) => {
-      if (CRYPTO_SOURCE_BLACKLIST.some((d) => a.url?.toLowerCase().includes(d))) {
-        logRejection("blacklisted source", a);
-        return false;
-      }
-      if (!TRUSTED_CRYPTO_SOURCES.some((s) => a.source?.name?.toLowerCase().includes(s))) {
-        logRejection("untrusted crypto publisher", a);
-        return false;
-      }
-      return true;
-    });
+    articles = articles.filter(
+      (a) =>
+        !CRYPTO_SOURCE_BLACKLIST.some((d) =>
+          a.url?.toLowerCase().includes(d)
+        ) &&
+        TRUSTED_CRYPTO_SOURCES.some((s) =>
+          a.source?.name?.toLowerCase().includes(s)
+        )
+    );
+    log(`${category}:after:crypto-filter`, articles.length);
   }
 
-  return normalizeNews(articles, category);
+  const normalized = normalizeNews(articles, category);
+  log(`${category}:after:normalize`, normalized.length);
+
+  return normalized;
 }
 
-// TRENDING SCORE
+// TRENDING + FRESH LOGIC
+const FRESH_WINDOW = 12 * 60 * 60 * 1000; // increased to 12h
+const TRENDING_WINDOW = 48 * 60 * 60 * 1000;
+
+function isFresh(item: NewsItem): boolean {
+  return Date.now() - new Date(item.publishedAt).getTime() <= FRESH_WINDOW;
+}
+
 function trendingScore(item: NewsItem): number {
-  const hoursAgo = (Date.now() - new Date(item.publishedAt).getTime()) / 36e5;
+  const hoursAgo =
+    (Date.now() - new Date(item.publishedAt).getTime()) / 36e5;
   return Math.max(0, 48 - hoursAgo) * 2 + sourceScore(item.source, item.category);
 }
 
-// AI SUMMARIZATION
+// AI SUMMARY
 async function summarizeStory(story: NewsItem): Promise<string> {
   return `Summary: ${story.title} - ${story.description?.slice(0, 120)}...`;
 }
 
 // GET TOP NEWS
-export async function getTopNews(): Promise<{
-  tech: NewsItem[];
-  finance: NewsItem[];
-  crypto: NewsItem[];
-  topStories: NewsItem[];
-}> {
-  const [tech, finance, crypto] = await Promise.all([
+export async function getTopNews() {
+  const [techRaw, financeRaw, cryptoRaw] = await Promise.all([
     fetchCategory("tech"),
     fetchCategory("finance"),
     fetchCategory("crypto"),
   ]);
 
-  let globalPool = [...tech, ...finance, ...crypto];
+  log("raw:counts", {
+    tech: techRaw.length,
+    finance: financeRaw.length,
+    crypto: cryptoRaw.length,
+  });
 
-  // Filter duplicates across categories
-  globalPool = dedupeAcrossCategories(globalPool);
+  function processCategory(
+    items: NewsItem[],
+    categoryName: string
+  ): EnrichedNewsItem[] {
+    const trendingPool = items.filter(
+      (i) => Date.now() - new Date(i.publishedAt).getTime() <= TRENDING_WINDOW
+    );
+    log(`${categoryName}:after:trending-window`, trendingPool.length);
 
-  const canonical: NewsItem[] = [];
+    const poolToUse = trendingPool.length > 0 ? trendingPool : items;
+
+    const deduped = dedupeCanonical(poolToUse).sort(
+      (a, b) => trendingScore(b) - trendingScore(a)
+    );
+    log(`${categoryName}:after:dedupe`, deduped.length);
+
+    const enriched: EnrichedNewsItem[] = deduped
+      .slice(0, 10)
+      .map((item) => ({
+        ...item,
+        isFresh: isFresh(item),
+        feedType: isFresh(item) ? "breaking" : "trending",
+      }));
+
+    const freshCount = enriched.filter((i) => i.isFresh).length;
+    log(`${categoryName}:fresh-count`, freshCount);
+
+    return enriched;
+  }
+
+  const tech = processCategory(techRaw, "tech");
+  const finance = processCategory(financeRaw, "finance");
+  const crypto = processCategory(cryptoRaw, "crypto");
+
+  const globalPool = dedupeAcrossCategories([...tech, ...finance, ...crypto]);
+  log("globalPool:count", globalPool.length);
+
+  const canonical: EnrichedNewsItem[] = [];
+  let redisSkipped = 0;
 
   for (const item of globalPool) {
     const key = `canonical:${item.category}:${fingerprint(item)}`;
-    try {
-      if (redis) {
-        const cached = await redis.get(key);
-        if (cached) {
-          logRejection("duplicate in Redis cache", { ...item, source: { name: item.source } });
-          continue;
-        }
-        await redis.set(key, JSON.stringify(item), { ex: 60 * 60 * 72 }); // 72h TTL
+    if (redis) {
+      const cached = await redis.get(key);
+      if (cached) {
+        redisSkipped++;
+        continue;
       }
-    } catch (err) {
-      console.error("[Redis Warning] Could not access Redis:", err);
+      await redis.set(key, JSON.stringify(item), { ex: 60 * 60 * 72 });
     }
     canonical.push(item);
   }
 
-  const uniqueStories = dedupeCanonical(canonical);
-  uniqueStories.sort((a, b) => trendingScore(b) - trendingScore(a));
+  log("redis:skipped", redisSkipped);
+  log("canonical:final-count", canonical.length);
 
-  for (const story of uniqueStories) {
+  canonical.sort((a, b) => trendingScore(b) - trendingScore(a));
+
+  for (const story of canonical) {
     if (!story.summary) story.summary = await summarizeStory(story);
   }
 
-  const topStories = uniqueStories.slice(0, 5);
+  // BREAKING NEWS FIX
+  let breaking = canonical.filter((i) => i.isFresh);
+
+  if (breaking.length === 0) {
+    breaking = canonical.slice(0, 5).map((item) => ({
+      ...item,
+      isFresh: true,
+      feedType: "breaking",
+    }));
+  }
+
+  log("breaking:count", breaking.length);
 
   return {
-    tech: uniqueStories.filter((n) => n.category === "tech").slice(0, 10),
-    finance: uniqueStories.filter((n) => n.category === "finance").slice(0, 10),
-    crypto: uniqueStories.filter((n) => n.category === "crypto").slice(0, 10),
-    topStories,
+    tech,
+    finance,
+    crypto,
+    breaking,
+    topStories: canonical.slice(0, 5),
   };
 }
-
