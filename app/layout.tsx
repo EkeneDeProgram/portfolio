@@ -14,9 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // title: "Ekene | Portfolio",
   title: "Ekene Onyekachi | Portfolio",
   description: "My personal portfolio",
+  icons: {
+    icon: "/icons/favicon.svg",
+    shortcut: "/icons/favicon.svg",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
