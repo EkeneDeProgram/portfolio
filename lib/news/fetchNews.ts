@@ -397,7 +397,6 @@ if (
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   });
-
   log("redis:init", "Redis enabled");
 } else {
   log("redis:init", "Redis disabled");
@@ -452,16 +451,14 @@ function sourceScore(source: string, category: NewsCategory): number {
   return 50;
 }
 
-// --------------------------------------------------------------------
-// ✅ STABLE FINGERPRINT (KEY FIX)
-// --------------------------------------------------------------------
+
+// STABLE FINGERPRINT
 function fingerprint(item: NewsItem): string {
   return item.url;
 }
 
-// --------------------------------------------------------------------
+
 // DEDUPE HELPERS
-// --------------------------------------------------------------------
 function dedupeCanonical(items: NewsItem[]): NewsItem[] {
   const map = new Map<string, NewsItem>();
 
@@ -500,9 +497,7 @@ function dedupeAcrossCategories(items: EnrichedNewsItem[]): EnrichedNewsItem[] {
   });
 }
 
-// --------------------------------------------------------------------
 // FETCH CATEGORY
-// --------------------------------------------------------------------
 async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   const sources = SOURCE_CATEGORIES[category];
   const query = QUERY_CATEGORIES[category];
@@ -542,9 +537,7 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   return normalized;
 }
 
-// --------------------------------------------------------------------
-// TRENDING + FRESH LOGIC
-// --------------------------------------------------------------------
+// TRENDING + FRESH
 const FRESH_WINDOW = 12 * 60 * 60 * 1000;
 const TRENDING_WINDOW = 48 * 60 * 60 * 1000;
 
@@ -562,15 +555,27 @@ function makeFeedType(item: NewsItem): "breaking" | "trending" {
   return isFresh(item) ? "breaking" : "trending";
 }
 
-// --------------------------------------------------------------------
+// ROTATING FALLBACK (NEW)
+function rotateFallback(
+  items: NewsItem[],
+  sessionId: string | undefined,
+  count: number
+): NewsItem[] {
+  if (!items.length) return [];
+  const seed =
+    (sessionId?.split("-").join("").length ?? 1) % items.length;
+
+  const rotated = [...items.slice(seed), ...items.slice(0, seed)];
+  return rotated.slice(0, count);
+}
+
+
 // MAIN
-// --------------------------------------------------------------------
 export async function getTopNews(
   sessionId?: string,
   options?: { dedupe?: boolean }
 ) {
   const dedupe = options?.dedupe !== false;
-
   log("session", sessionId ?? "no-session");
 
   const [techRaw, financeRaw, cryptoRaw] = await Promise.all([
@@ -601,20 +606,27 @@ export async function getTopNews(
     }
 
     const enriched: EnrichedNewsItem[] = [];
-    let skipped = 0;
+    let skippedSession = 0;
+    let skippedDay = 0;
+    const today = new Date().toISOString().slice(0, 10);
 
     for (const item of pool.slice(0, 10)) {
-      const key = `session:${sessionId}:${categoryName}:${fingerprint(item)}`;
-
-      const seen = redis ? await redis.get(key) : null;
-
-      if (seen) {
-        skipped++;
-        continue;
-      }
+      const fp = fingerprint(item);
+      const sessionKey = `session:${sessionId}:${categoryName}:${fp}`;
+      const dayKey = `day:${today}:${categoryName}:${fp}`;
 
       if (redis) {
-        await redis.set(key, "1", { ex: 60 * 60 * 72 });
+        if (await redis.get(sessionKey)) {
+          skippedSession++;
+          continue;
+        }
+        if (await redis.get(dayKey)) {
+          skippedDay++;
+          continue;
+        }
+
+        await redis.set(sessionKey, "1", { ex: 60 * 60 * 72 });
+        await redis.set(dayKey, "1", { ex: 60 * 60 * 24 });
       }
 
       enriched.push({
@@ -624,15 +636,17 @@ export async function getTopNews(
       });
     }
 
-    log(`${categoryName}:session-skipped`, skipped);
+    log(`${categoryName}:session-skipped`, skippedSession);
+    log(`${categoryName}:day-skipped`, skippedDay);
 
-    return enriched.length
-      ? enriched
-      : pool.slice(0, 5).map((item) => ({
-          ...item,
-          isFresh: isFresh(item),
-          feedType: makeFeedType(item),
-        }));
+    if (enriched.length) return enriched;
+
+    log(`${categoryName}:fallback`, "rotated");
+    return rotateFallback(pool, sessionId, 5).map((item) => ({
+      ...item,
+      isFresh: isFresh(item),
+      feedType: makeFeedType(item),
+    }));
   }
 
   const tech = await processCategory(techRaw, "tech");

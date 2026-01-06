@@ -363,9 +363,8 @@ interface Props {
   searchParams?: Promise<{ type?: "blog" | "news" }>;
 }
 
-/* ----------------------------- */
-/* ✅ SESSION FETCH (API-BASED)   */
-/* ----------------------------- */
+
+// SESSION FETCH (API-BASED)
 async function fetchSessionId(): Promise<string> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -375,6 +374,7 @@ async function fetchSessionId(): Promise<string> {
 
   const res = await fetch(`${baseUrl}/api/session`, {
     cache: "no-store",
+    credentials: "include", // CRITICAL
   });
 
   if (!res.ok) {
@@ -384,6 +384,7 @@ async function fetchSessionId(): Promise<string> {
   const data = await res.json();
   return data.sessionId;
 }
+
 
 export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
@@ -442,7 +443,7 @@ export default async function BlogPage({ searchParams }: Props) {
     categorySlug: post.categorySlug,
   }));
 
-  // ✅ SESSION-AWARE NEWS FETCH
+  // SESSION-AWARE NEWS FETCH
   const sessionId = await fetchSessionId();
   const newsRaw = await getTopNews(sessionId);
 
