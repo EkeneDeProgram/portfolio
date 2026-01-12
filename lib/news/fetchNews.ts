@@ -306,14 +306,35 @@
 //     log("breaking:fallback", "trending-used");
 //   }
 
+//   // SOFT TOP STORIES FALLBACK + LOGGING
+//   let topStories: EnrichedNewsItem[];
+//   const topPool = globalPool.slice(0, 5);
+
+//   if (topPool.length < 5) {
+//     topStories = rotateFallback(globalPool, sessionId, 5).map((item) => ({
+//       ...item,
+//       isFresh: isFresh(item),
+//       feedType: "trending",
+//     }));
+//     log("topStories:fallback", "rotated-used");
+//   } else {
+//     topStories = topPool;
+//     log("topStories", "normal");
+//   }
+
 //   return {
 //     tech,
 //     finance,
 //     crypto,
 //     breaking,
-//     topStories: globalPool.slice(0, 5),
+//     topStories,
 //   };
 // }
+
+
+
+
+
 
 
 
@@ -404,8 +425,7 @@ function sourceScore(source: string, category: NewsCategory): number {
     )
   )
     return 100;
-  if (["the verge", "wired", "techcrunch"].some((p) => s.includes(p)))
-    return 80;
+  if (["the verge", "wired", "techcrunch"].some((p) => s.includes(p))) return 80;
   return 50;
 }
 
@@ -478,9 +498,7 @@ async function fetchCategory(category: NewsCategory): Promise<NewsItem[]> {
   if (category === "crypto") {
     articles = articles.filter(
       (a) =>
-        !CRYPTO_SOURCE_BLACKLIST.some((d) =>
-          a.url?.toLowerCase().includes(d)
-        ) &&
+        !CRYPTO_SOURCE_BLACKLIST.some((d) => a.url?.toLowerCase().includes(d)) &&
         TRUSTED_CRYPTO_SOURCES.some((s) =>
           a.source?.name?.toLowerCase().includes(s)
         )
@@ -502,8 +520,7 @@ function isFresh(item: NewsItem): boolean {
 }
 
 function trendingScore(item: NewsItem): number {
-  const hoursAgo =
-    (Date.now() - new Date(item.publishedAt).getTime()) / 36e5;
+  const hoursAgo = (Date.now() - new Date(item.publishedAt).getTime()) / 36e5;
   return Math.max(0, 48 - hoursAgo) * 2 + sourceScore(item.source, item.category);
 }
 
@@ -518,8 +535,7 @@ function rotateFallback(
   count: number
 ): NewsItem[] {
   if (!items.length) return [];
-  const seed =
-    (sessionId?.split("-").join("").length ?? 1) % items.length;
+  const seed = (sessionId?.split("-").join("").length ?? 1) % items.length;
 
   const rotated = [...items.slice(seed), ...items.slice(0, seed)];
   return rotated.slice(0, count);
@@ -528,7 +544,7 @@ function rotateFallback(
 // MAIN
 export async function getTopNews(
   sessionId?: string,
-  options?: { dedupe?: boolean }
+  options?: { dedupe?: boolean; forceRefresh?: boolean } // ✅ Added forceRefresh
 ) {
   const dedupe = options?.dedupe !== false;
   log("session", sessionId ?? "no-session");
@@ -571,7 +587,8 @@ export async function getTopNews(
       const dayKey = `day:${today}:${categoryName}:${fp}`;
 
       if (redis) {
-        if (await redis.get(sessionKey)) {
+        // ✅ Modified for forceRefresh
+        if (!options?.forceRefresh && (await redis.get(sessionKey))) {
           skippedSession++;
           continue;
         }
@@ -608,11 +625,9 @@ export async function getTopNews(
   const finance = await processCategory(financeRaw, "finance");
   const crypto = await processCategory(cryptoRaw, "crypto");
 
-  const globalPool = dedupeAcrossCategories([
-    ...tech,
-    ...finance,
-    ...crypto,
-  ]).sort((a, b) => trendingScore(b) - trendingScore(a));
+  const globalPool = dedupeAcrossCategories([...tech, ...finance, ...crypto]).sort(
+    (a, b) => trendingScore(b) - trendingScore(a)
+  );
 
   // SOFT BREAKING FALLBACK + LOGGING
   const freshBreaking = globalPool.filter((i) => i.isFresh).slice(0, 5);

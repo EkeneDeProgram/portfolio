@@ -4,8 +4,6 @@
 // import Link from "next/link";
 // import { notFound } from "next/navigation";
 
-
-
 // // Helpers
 // const slugify = (text: string) =>
 //   text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
@@ -18,15 +16,20 @@
 // }
 
 // interface Props {
-//   params: { slug: string } | Promise<{ slug: string }>;
+//   params: { slug: string };
 // }
 
 // export async function generateMetadata({ params }: Props) {
-//   const { slug } = await params;
-//   const news = await getTopNews();
-//   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
+//   const { slug } = params;
 
-//   const article = allArticles.find((item) => newsSlug(item.title, item.url) === slug);
+//   // NO session, NO dedupe
+//   const news = await getTopNews(undefined, { dedupe: false });
+
+//   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
+//   const article = allArticles.find(
+//     (item) => newsSlug(item.title, item.url) === slug
+//   );
+
 //   if (!article) return {};
 
 //   return {
@@ -41,11 +44,16 @@
 // }
 
 // export default async function NewsSlugPage({ params }: Props) {
-//   const { slug } = await params;
-//   const news = await getTopNews();
-//   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
+//   const { slug } = params;
 
-//   const article = allArticles.find((item) => newsSlug(item.title, item.url) === slug);
+//   // NO session, NO dedupe
+//   const news = await getTopNews(undefined, { dedupe: false });
+
+//   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
+//   const article = allArticles.find(
+//     (item) => newsSlug(item.title, item.url) === slug
+//   );
+
 //   if (!article) return notFound();
 
 //   return (
@@ -73,7 +81,7 @@
 //             src={article.image || "/images/news-fallback.jpg"}
 //             alt={article.title}
 //             fill
-//             unoptimized // fixes external domain issues
+//             unoptimized
 //             className="object-cover"
 //           />
 //         </div>
@@ -106,14 +114,14 @@
 
 
 
-
-
-
 import { getTopNews } from "@/lib/news/fetchNews";
 import BlogLayout from "@/components/blog/BlogLayout";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+// ISR — regenerate every 30 minutes
+export const revalidate = 60 * 30;
 
 // Helpers
 const slugify = (text: string) =>
@@ -133,13 +141,11 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const { slug } = params;
 
-  // ❌ NO session, NO dedupe
+  // NO session, NO dedupe
   const news = await getTopNews(undefined, { dedupe: false });
 
   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
-  const article = allArticles.find(
-    (item) => newsSlug(item.title, item.url) === slug
-  );
+  const article = allArticles.find((item) => newsSlug(item.title, item.url) === slug);
 
   if (!article) return {};
 
@@ -157,13 +163,11 @@ export async function generateMetadata({ params }: Props) {
 export default async function NewsSlugPage({ params }: Props) {
   const { slug } = params;
 
-  // ❌ NO session, NO dedupe
+  // NO session, NO dedupe
   const news = await getTopNews(undefined, { dedupe: false });
 
   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
-  const article = allArticles.find(
-    (item) => newsSlug(item.title, item.url) === slug
-  );
+  const article = allArticles.find((item) => newsSlug(item.title, item.url) === slug);
 
   if (!article) return notFound();
 

@@ -37,7 +37,6 @@
 //   },
 // };
 
-
 // // Types
 // type RichTextChild = { text: string; type: string };
 // type RichTextBlock = { type: string; children: RichTextChild[] };
@@ -124,6 +123,29 @@
 //   searchParams?: Promise<{ type?: "blog" | "news" }>;
 // }
 
+
+// // SESSION FETCH (API-BASED)
+// async function fetchSessionId(): Promise<string> {
+//   const baseUrl =
+//     process.env.NEXT_PUBLIC_SITE_URL ??
+//     (process.env.VERCEL_URL
+//       ? `https://${process.env.VERCEL_URL}`
+//       : "http://localhost:3000");
+
+//   const res = await fetch(`${baseUrl}/api/session`, {
+//     cache: "no-store",
+//     credentials: "include", // CRITICAL
+//   });
+
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch session");
+//   }
+
+//   const data = await res.json();
+//   return data.sessionId;
+// }
+
+
 // export default async function BlogPage({ searchParams }: Props) {
 //   const params = await searchParams;
 //   const filter = params?.type ?? "all";
@@ -174,13 +196,17 @@
 //     excerpt: post.excerpt,
 //     date: post.createdAt,
 //     href: `/blog/${post.slug}`,
-//     image: post.featuredImage ? `http://localhost:1337${post.featuredImage.url}` : undefined,
+//     image: post.featuredImage
+//       ? `http://localhost:1337${post.featuredImage.url}`
+//       : undefined,
 //     categoryLabel: post.category,
 //     categorySlug: post.categorySlug,
 //   }));
 
-//   // News
-//   const newsRaw = await getTopNews();
+//   // SESSION-AWARE NEWS FETCH
+//   const sessionId = await fetchSessionId();
+//   const newsRaw = await getTopNews(sessionId);
+
 //   const newsByCategory: Record<string, UnifiedItem[]> = {};
 
 //   Object.entries(newsRaw).forEach(([category, items]) => {
@@ -238,7 +264,11 @@
 
 
 
-import { strapiQuery } from "@/lib/cms";
+
+
+
+
+import { strapiQuery } from "@/lib/cms"; 
 import { getTopNews } from "@/lib/news/fetchNews";
 import { UnifiedItem } from "@/lib/blog/unified";
 
@@ -248,6 +278,9 @@ import UnifiedCard from "@/components/blog/UnifiedCard";
 import BlogEmptyState from "@/components/blog/BlogEmptyState";
 
 import { Metadata } from "next";
+
+// ISR: regenerate this page every 15 minutes
+export const revalidate = 60 * 15; // 15 minutes
 
 // Blog page SEO metadata
 export const metadata: Metadata = {
@@ -363,7 +396,6 @@ interface Props {
   searchParams?: Promise<{ type?: "blog" | "news" }>;
 }
 
-
 // SESSION FETCH (API-BASED)
 async function fetchSessionId(): Promise<string> {
   const baseUrl =
@@ -384,7 +416,6 @@ async function fetchSessionId(): Promise<string> {
   const data = await res.json();
   return data.sessionId;
 }
-
 
 export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
