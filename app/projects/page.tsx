@@ -77,22 +77,22 @@ const projects = [
       "Improved UI/UX for better admin flow",
     ],
   },
-  {
-    title: "Crypto Trading Bot",
-    role: "Creator",
-    tech: ["Python", "Trading APIs", "Automation", "Algorithms"],
-    description:
-      "A Python-based automated crypto trading bot designed to analyze price movements and execute trades based on defined strategies.",
-    contributions: [
-      "Implemented trading strategy logic",
-      "Integrated exchange APIs",
-      "Built automated buy/sell triggers",
-      "Added logging and risk control features",
-    ],
-    github: "#",
-    githubFrontend: "#",
-    projectLink: "#",
-  },
+  // {
+  //   title: "Crypto Trading Bot",
+  //   role: "Creator",
+  //   tech: ["Python", "Trading APIs", "Automation", "Algorithms"],
+  //   description:
+  //     "A Python-based automated crypto trading bot designed to analyze price movements and execute trades based on defined strategies.",
+  //   contributions: [
+  //     "Implemented trading strategy logic",
+  //     "Integrated exchange APIs",
+  //     "Built automated buy/sell triggers",
+  //     "Added logging and risk control features",
+  //   ],
+  //   github: "#",
+  //   githubFrontend: "#",
+  //   projectLink: "#",
+  // },
   {
     title: "CV Generator (Web App)",
     role: "Full-Stack Engineer",
