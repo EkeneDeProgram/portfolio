@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "next/link"; 
 import Image from "next/image";
 
 // Rich text node types (from CMS)
@@ -42,6 +42,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 220px, 220px"
+            unoptimized={post.featuredImage?.url?.startsWith("http")} // <-- external images skipped for optimization
           />
         </div>
       )}
@@ -50,7 +51,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
         {post.category && (
           <span className="text-xs sm:text-sm text-blue-600 font-semibold uppercase">
             {post.category}
-          </span>
+        </span>
         )}
 
         <Link
@@ -71,6 +72,3 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
     </li>
   );
 }
-
-
-

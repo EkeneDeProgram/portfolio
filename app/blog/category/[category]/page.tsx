@@ -1,5 +1,3 @@
-// app/blog/category/[category]/page.tsx
-
 import { strapiQuery } from "@/lib/cms";
 import BlogLayout from "@/components/blog/BlogLayout";
 import BlogPostCard from "@/components/blog/BlogPostCard";
@@ -35,7 +33,6 @@ export const metadata: Metadata = {
     creator: "@EkeneDeProgram",
   },
 };
-
 
 // Types
 type RichTextChild = { text: string; type: string };
@@ -191,11 +188,22 @@ export default async function CategoryPage({ params }: Props) {
       ) : (
         <ul className="space-y-6 sm:space-y-8 md:space-y-10 mt-4 sm:mt-6">
           {posts.map(post => (
-            <BlogPostCard key={post.documentId} post={post} />
+            <BlogPostCard
+              key={post.documentId}
+              post={{
+                ...post,
+                featuredImage: post.featuredImage
+                  ? {
+                      ...post.featuredImage,
+                      // Always unoptimized for external images
+                      url: post.featuredImage.url,
+                    }
+                  : undefined,
+              }}
+            />
           ))}
         </ul>
       )}
     </BlogLayout>
   );
 }
-
