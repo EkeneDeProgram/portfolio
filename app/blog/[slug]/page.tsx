@@ -19,7 +19,6 @@ type Post = {
   featuredImage?: FeaturedImage;
 };
 
-
 // DYNAMIC METADATA
 interface Params {
   params: Promise<{ slug: string }>;
@@ -75,9 +74,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
-  // Normalize content before using flatMap
   const contentArray = normalizeContent(post.content);
-
   const stripHtml = (html: string) => html.replace(/<[^>]*>/g, "");
   const contentText = contentArray
     .flatMap((block) => block.children)
@@ -111,7 +108,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-
 // GRAPHQL QUERY FOR PAGE
 const GET_POST_BY_SLUG = `
 query ($slug: String!) {
@@ -139,7 +135,6 @@ query ($slug: String!) {
 }
 `;
 
-
 // HELPERS
 function renderRichText(content: RichTextBlock[] | string | undefined) {
   const blocks = normalizeContent(content);
@@ -153,7 +148,6 @@ function renderRichText(content: RichTextBlock[] | string | undefined) {
     })
     .join("");
 }
-
 
 // PAGE COMPONENT
 interface Props {
@@ -194,7 +188,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) return notFound();
 
   return (
-    <article className="mx-auto w-full max-w-4xl px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-10 md:py-12 lg:py-14">
+    <article className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 py-8 sm:py-10 md:py-12 lg:py-14">
       {post.categorySlug && (
         <Link
           href={`/blog/category/${post.categorySlug}`}
@@ -220,7 +214,7 @@ export default async function BlogPostPage({ params }: Props) {
       </p>
 
       {post.featuredImage && (
-        <div className="relative w-full h-48 sm:h-60 md:h-72 lg:h-[420px] mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden">
+        <div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-[420px] mb-6 sm:mb-8 md:mb-10 rounded-xl overflow-hidden">
           <Image
             src={
               post.featuredImage.url.startsWith("http")

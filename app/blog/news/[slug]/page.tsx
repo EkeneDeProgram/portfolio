@@ -19,11 +19,13 @@ function newsSlug(title: string, url: string) {
 }
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>; // <- params can be a Promise
 }
 
+// DYNAMIC METADATA
 export async function generateMetadata({ params }: Props) {
-  const { slug } = params;
+  const resolvedParams = await params; // await first
+  const { slug } = resolvedParams;
 
   // NO session, NO dedupe
   const news = await getTopNews(undefined, { dedupe: false });
@@ -44,10 +46,11 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+// PAGE COMPONENT
 export default async function NewsSlugPage({ params }: Props) {
-  const { slug } = params;
+  const resolvedParams = await params; // await first
+  const { slug } = resolvedParams;
 
-  // NO session, NO dedupe
   const news = await getTopNews(undefined, { dedupe: false });
 
   const allArticles = [...news.tech, ...news.finance, ...news.crypto];
@@ -57,25 +60,27 @@ export default async function NewsSlugPage({ params }: Props) {
 
   return (
     <BlogLayout>
-      <article className="mx-auto max-w-4xl px-4 py-10">
+      <article className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <Link
           href="/blog?type=news"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 mb-6"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
         >
           ← Back to News
         </Link>
 
-        <span className="block text-xs text-blue-600 font-semibold uppercase mb-2">
-          {article.category.toUpperCase()}
+        <span className="mb-2 block text-xs font-semibold uppercase text-blue-600">
+          {article.category?.toUpperCase()}
         </span>
 
-        <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
+        <h1 className="mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">
+          {article.title}
+        </h1>
 
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="mb-6 text-sm text-gray-500">
           {new Date(article.publishedAt).toLocaleDateString()} · {article.source}
         </p>
 
-        <div className="relative w-full h-[420px] mb-8 rounded-xl overflow-hidden">
+        <div className="relative mb-8 h-[220px] sm:h-[320px] lg:h-[420px] w-full overflow-hidden rounded-xl">
           <Image
             src={article.image || "/images/news-fallback.jpg"}
             alt={article.title}
@@ -85,7 +90,7 @@ export default async function NewsSlugPage({ params }: Props) {
           />
         </div>
 
-        <div className="prose max-w-none">
+        <div className="prose prose-sm sm:prose-base md:prose-lg lg:prose-xl max-w-full">
           <p>{article.description}</p>
         </div>
 
@@ -94,7 +99,7 @@ export default async function NewsSlugPage({ params }: Props) {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 font-medium hover:underline"
+            className="font-medium text-blue-600 hover:underline"
           >
             Read original article ↗
           </a>

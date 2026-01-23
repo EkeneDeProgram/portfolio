@@ -45,12 +45,12 @@ type Post = {
   createdAt: string;
   content: RichTextBlock[];
   featuredImage?: { url: string; alternativeText?: string };
-  category: string;      // Display label
-  categorySlug: string;  // URL slug
+  category: string;
+  categorySlug: string;
   excerpt: string;
 };
 
-// GraphQL query for all collections
+// GraphQL query
 const GET_ALL_POSTS = `
   query {
     projectUpdates(sort: "createdAt:desc") {
@@ -92,8 +92,13 @@ function normalizeContent(content: RichTextBlock[] | string): RichTextBlock[] {
 
 function getExcerpt(content: RichTextBlock[] | string, length = 140) {
   const blocks = normalizeContent(content);
-  const text = blocks.flatMap(block => block.children).map(child => stripHtml(child.text)).join(" ");
-  return text.length <= length ? text : text.slice(0, text.lastIndexOf(" ", length)) + "…";
+  const text = blocks
+    .flatMap((block) => block.children)
+    .map((child) => stripHtml(child.text))
+    .join(" ");
+  return text.length <= length
+    ? text
+    : text.slice(0, text.lastIndexOf(" ", length)) + "…";
 }
 
 interface Props {
@@ -101,7 +106,6 @@ interface Props {
 }
 
 export default async function CategoryPage({ params }: Props) {
-  // Await params if it's a Promise
   const resolvedParams = await params;
   const category = resolvedParams.category;
 
@@ -133,7 +137,7 @@ export default async function CategoryPage({ params }: Props) {
   }>(GET_ALL_POSTS);
 
   const allPosts: Post[] = [
-    ...data.projectUpdates.map(p => ({
+    ...data.projectUpdates.map((p) => ({
       documentId: p.documentId,
       title: p.title,
       slug: p.slug,
@@ -144,7 +148,7 @@ export default async function CategoryPage({ params }: Props) {
       categorySlug: "project-updates",
       excerpt: getExcerpt(p.content),
     })),
-    ...data.careerGrowths.map(p => ({
+    ...data.careerGrowths.map((p) => ({
       documentId: p.documentId,
       title: p.title,
       slug: p.slug,
@@ -155,7 +159,7 @@ export default async function CategoryPage({ params }: Props) {
       categorySlug: "career-growth",
       excerpt: getExcerpt(p.content),
     })),
-    ...data.engineeringNotes.map(p => ({
+    ...data.engineeringNotes.map((p) => ({
       documentId: p.documentId,
       title: p.title,
       slug: p.slug,
@@ -168,42 +172,46 @@ export default async function CategoryPage({ params }: Props) {
     })),
   ];
 
-  const posts = allPosts.filter(post => post.categorySlug === category);
-
-  posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const posts = allPosts
+    .filter((post) => post.categorySlug === category)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+    );
 
   return (
     <BlogLayout>
-      {/* Responsive heading */}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 md:mb-10">
-        {category.replace(/-/g, " ")}
-      </h1>
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h1 className="mb-6 sm:mb-8 md:mb-10 text-2xl sm:text-3xl md:text-4xl font-bold capitalize">
+          {category.replace(/-/g, " ")}
+        </h1>
 
-      <BlogCategoryTabs active={category} />
+        <BlogCategoryTabs active={category} />
 
-      {posts.length === 0 ? (
-        <BlogEmptyState
-          message={`No posts found for "${category.replace(/-/g, " ")}".`}
-        />
-      ) : (
-        <ul className="space-y-6 sm:space-y-8 md:space-y-10 mt-4 sm:mt-6">
-          {posts.map(post => (
-            <BlogPostCard
-              key={post.documentId}
-              post={{
-                ...post,
-                featuredImage: post.featuredImage
-                  ? {
-                      ...post.featuredImage,
-                      // Always unoptimized for external images
-                      url: post.featuredImage.url,
-                    }
-                  : undefined,
-              }}
-            />
-          ))}
-        </ul>
-      )}
+        {posts.length === 0 ? (
+          <BlogEmptyState
+            message={`No posts found for "${category.replace(/-/g, " ")}".`}
+          />
+        ) : (
+          <ul className="mt-6 sm:mt-8 space-y-6 sm:space-y-8 md:space-y-10">
+            {posts.map((post) => (
+              <BlogPostCard
+                key={post.documentId}
+                post={{
+                  ...post,
+                  featuredImage: post.featuredImage
+                    ? {
+                        ...post.featuredImage,
+                        url: post.featuredImage.url,
+                      }
+                    : undefined,
+                }}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </BlogLayout>
   );
 }
