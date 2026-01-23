@@ -1,4 +1,4 @@
-import { strapiQuery } from "@/lib/cms"; 
+import { strapiQuery } from "@/lib/cms";
 import { getTopNews } from "@/lib/news/fetchNews";
 import { UnifiedItem } from "@/lib/blog/unified";
 
@@ -8,10 +8,10 @@ import UnifiedCard from "@/components/blog/UnifiedCard";
 import BlogEmptyState from "@/components/blog/BlogEmptyState";
 
 import { Metadata } from "next";
-import { event as gaEvent } from "@/lib/gtag"; // <-- import GA event helper
+import { event as gaEvent } from "@/lib/gtag";
 
 // ISR: regenerate this page every 15 minutes
-export const revalidate = 60 * 15; // 15 minutes
+export const revalidate = 60 * 15;
 
 // Blog page SEO metadata
 export const metadata: Metadata = {
@@ -115,7 +115,6 @@ function slugify(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
 }
 
-// Use last URL segment for news uniqueness
 function newsSlug(title: string, url: string) {
   const urlParts = url.split("/");
   const urlId = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2];
@@ -127,7 +126,7 @@ interface Props {
   searchParams?: Promise<{ type?: "blog" | "news" }>;
 }
 
-// SESSION FETCH (API-BASED)
+// SESSION FETCH
 async function fetchSessionId(): Promise<string> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -152,7 +151,6 @@ export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
   const filter = params?.type ?? "all";
 
-  // CMS posts
   const data = await strapiQuery<StrapiBlogResponse>(GET_ALL_POSTS);
 
   const blogPosts: Post[] = [
@@ -213,7 +211,6 @@ export default async function BlogPage({ searchParams }: Props) {
       }),
   }));
 
-  // SESSION-AWARE NEWS FETCH
   const sessionId = await fetchSessionId();
   const newsRaw = await getTopNews(sessionId);
 
@@ -241,35 +238,43 @@ export default async function BlogPage({ searchParams }: Props) {
 
   return (
     <BlogLayout>
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Blog</h1>
-      <BlogContentTypeTabs active={filter} />
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">
+          Blog
+        </h1>
 
-      {filter !== "news" && blogItems.length > 0 && (
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-          {blogItems.map((item) => (
-            <UnifiedCard key={`${item.type}-${item.id}`} item={item} />
+        <BlogContentTypeTabs active={filter} />
+
+        {filter !== "news" && blogItems.length > 0 && (
+          <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {blogItems.map((item) => (
+              <UnifiedCard key={`${item.type}-${item.id}`} item={item} />
+            ))}
+          </ul>
+        )}
+
+        {(filter === "news" || filter === "all") &&
+          Object.entries(newsByCategory).map(([category, items]) => (
+            <section key={category} className="mt-10 sm:mt-12">
+              <h2 className="mb-4 text-lg sm:text-xl font-semibold">
+                {category.charAt(0).toUpperCase() + category.slice(1)} News
+              </h2>
+
+              {items.length === 0 ? (
+                <BlogEmptyState message={`No ${category} news available.`} />
+              ) : (
+                <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((item) => (
+                    <UnifiedCard
+                      key={`${item.type}-${item.id}`}
+                      item={item}
+                    />
+                  ))}
+                </ul>
+              )}
+            </section>
           ))}
-        </ul>
-      )}
-
-      {(filter === "news" || filter === "all") &&
-        Object.entries(newsByCategory).map(([category, items]) => (
-          <section key={category} className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">
-              {category.charAt(0).toUpperCase() + category.slice(1)} News
-            </h2>
-
-            {items.length === 0 ? (
-              <BlogEmptyState message={`No ${category} news available.`} />
-            ) : (
-              <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item) => (
-                  <UnifiedCard key={`${item.type}-${item.id}`} item={item} />
-                ))}
-              </ul>
-            )}
-          </section>
-        ))}
+      </div>
     </BlogLayout>
   );
 }
