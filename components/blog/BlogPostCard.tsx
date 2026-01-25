@@ -1,6 +1,8 @@
 import Link from "next/link"; 
 import Image from "next/image";
 
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || "http://localhost:1337";
+
 // Rich text node types (from CMS)
 type RichTextChild = { text: string; type: string };
 type RichTextBlock = { type: string; children: RichTextChild[] };
@@ -29,7 +31,8 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
     post.featuredImage?.url?.startsWith("http")
       ? post.featuredImage.url
       : post.featuredImage?.url
-      ? `http://localhost:1337${post.featuredImage.url}`
+      ? `${CMS_URL}${post.featuredImage.url}`
+      // ? `http://localhost:1337${post.featuredImage.url}`
       : "/images/news-placeholder.jpg"; // fallback placeholder
 
   return (

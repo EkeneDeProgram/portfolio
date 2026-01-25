@@ -47,7 +47,7 @@ const projects = [
       "Planned API architecture",
       "Worked closely with the founder to iterate and refine features",
     ],
-    projectLink: "#",
+    projectLink: "https://hive.innobee.buzz/login",
   },
   {
     title: "Nobzo Website — Company Landing Platform",
@@ -61,7 +61,7 @@ const projects = [
       "Implemented SEO-optimized pages",
       "Ensured smooth navigation and load performance",
     ],
-    projectLink: "#",
+    projectLink: "https://nobzoent.com/",
   },
   {
     title: "Nobzo Admin Dashboard",
@@ -105,9 +105,9 @@ const projects = [
       "Added PDF export and template formatting",
       "Implemented authentication and data storage",
     ],
-    github: "#",
-    githubFrontend: "#",
-    projectLink: "#",
+    github: "https://github.com/EkeneDeProgram/CV-Generator",
+    githubFrontend: "https://github.com/EkeneDeProgram/cv-generator-frontend",
+    projectLink: "https://cv-generator-frontend-wey1.onrender.com/",
   },
   {
     title: "Personal Portfolio",
@@ -120,8 +120,8 @@ const projects = [
       "Built responsive pages with clean sections",
       "Optimized for SEO and fast loading",
     ],
-    github: "#",
-    githubFrontend: "#",
+    github: "https://github.com/EkeneDeProgram/cms",
+    githubFrontend: "https://github.com/EkeneDeProgram/portfolio",
     projectLink: "#",
   },
 ];

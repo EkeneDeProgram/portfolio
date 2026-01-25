@@ -199,7 +199,8 @@ export default async function BlogPage({ searchParams }: Props) {
     image: post.featuredImage
       ? post.featuredImage.url.startsWith("http")
         ? post.featuredImage.url
-        : `http://localhost:1337${post.featuredImage.url}`
+        : `${process.env.NEXT_PUBLIC_CMS_URL}${post.featuredImage.url}`
+        // : `http://localhost:1337${post.featuredImage.url}`
       : undefined,
     categoryLabel: post.category,
     categorySlug: post.categorySlug,
