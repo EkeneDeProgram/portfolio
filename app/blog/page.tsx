@@ -11,7 +11,9 @@ import { Metadata } from "next";
 import { event as gaEvent } from "@/lib/gtag";
 
 // ISR: regenerate this page every 15 minutes
-export const revalidate = 60 * 15;
+export const revalidate = 900; // 15 minutes in seconds
+
+// export const revalidate = 60 * 15;
 
 // Blog page SEO metadata
 export const metadata: Metadata = {

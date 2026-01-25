@@ -5,7 +5,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 // ISR — regenerate every 30 minutes
-export const revalidate = 60 * 30;
+export const revalidate = 1800; // 30 minutes in seconds
+
+// export const revalidate = 60 * 30;
 
 // Helpers
 const slugify = (text: string) =>

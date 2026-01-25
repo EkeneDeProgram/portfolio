@@ -33,100 +33,103 @@ export const metadata: Metadata = {
 };
 
 
-const projects = [
-  {
-    title: "Innobee — Innovation Management Platform",
-    role: "Senior Product Developer",
-    tech: ["Python", "Flask", "MongoDB", "Git", "Docker"],
-    description:
-      "Innobee is a peer-to-peer innovation-management platform designed to connect stakeholders across the innovation ecosystem and streamline collaboration. The platform allows organizations, innovators, and partners to co-develop ideas, share resources, and manage innovation initiatives more effectively. I contributed as a product developer, helping architect and implement platform features.",
-    contributions: [
-      "Designed and implemented REST APIs using Flask",
-      "Built core business logic and data models using MongoDB",
-      "Led the backend engineering team",
-      "Planned API architecture",
-      "Worked closely with the founder to iterate and refine features",
-    ],
-    projectLink: "https://hive.innobee.buzz/login",
-  },
-  {
-    title: "Nobzo Website — Company Landing Platform",
-    role: "Frontend Engineer",
-    tech: ["Next.js", "TypeScript", "TailwindCSS"],
-    description:
-      "A modern, responsive website for Nobzoent, designed to present the company’s vision, services, and pre-launch product experience.",
-    contributions: [
-      "Built the full frontend with Next.js",
-      "Designed reusable UI components",
-      "Implemented SEO-optimized pages",
-      "Ensured smooth navigation and load performance",
-    ],
-    projectLink: "https://nobzoent.com/",
-  },
-  {
-    title: "Nobzo Admin Dashboard",
-    role: "Full-Stack Engineer",
-    tech: ["React", "TypeScript", "Node.js", "REST APIs"],
-    description:
-      "An internal admin system used to manage users, reports, analytics, and product operations.",
-    contributions: [
-      "Built major frontend modules using React",
-      "Wrote backend APIs used by the dashboard",
-      "Integrated the backend with React components",
-      "Implemented authentication, data tables, filters, and forms",
-      "Improved UI/UX for better admin flow",
-    ],
-  },
-  // {
-  //   title: "Crypto Trading Bot",
-  //   role: "Creator",
-  //   tech: ["Python", "Trading APIs", "Automation", "Algorithms"],
-  //   description:
-  //     "A Python-based automated crypto trading bot designed to analyze price movements and execute trades based on defined strategies.",
-  //   contributions: [
-  //     "Implemented trading strategy logic",
-  //     "Integrated exchange APIs",
-  //     "Built automated buy/sell triggers",
-  //     "Added logging and risk control features",
-  //   ],
-  //   github: "#",
-  //   githubFrontend: "#",
-  //   projectLink: "#",
-  // },
-  {
-    title: "CV Generator (Web App)",
-    role: "Full-Stack Engineer",
-    tech: ["Node.js", "TypeScript", "Express", "React"],
-    description:
-      "A web tool that helps users generate clean, professional CVs through a simple and interactive UI.",
-    contributions: [
-      "Built backend API with TypeScript + Express",
-      "Created client-side form builder with React",
-      "Added PDF export and template formatting",
-      "Implemented authentication and data storage",
-    ],
-    github: "https://github.com/EkeneDeProgram/CV-Generator",
-    githubFrontend: "https://github.com/EkeneDeProgram/cv-generator-frontend",
-    projectLink: "https://cv-generator-frontend-wey1.onrender.com/",
-  },
-  {
-    title: "Personal Portfolio",
-    role: "Creator",
-    tech: ["Next.js", "TailwindCSS"],
-    description:
-      "A professional portfolio built to showcase my engineering experience, projects, and skills.",
-    contributions: [
-      "Designed minimalist UI layout",
-      "Built responsive pages with clean sections",
-      "Optimized for SEO and fast loading",
-    ],
-    github: "https://github.com/EkeneDeProgram/cms",
-    githubFrontend: "https://github.com/EkeneDeProgram/portfolio",
-    projectLink: "#",
-  },
-];
+
 
 export default function ProjectsPage() {
+    
+  const projects = [
+    {
+      title: "Innobee — Innovation Management Platform",
+      role: "Senior Product Developer",
+      tech: ["Python", "Flask", "MongoDB", "Git", "Docker"],
+      description:
+        "Innobee is a peer-to-peer innovation-management platform designed to connect stakeholders across the innovation ecosystem and streamline collaboration. The platform allows organizations, innovators, and partners to co-develop ideas, share resources, and manage innovation initiatives more effectively. I contributed as a product developer, helping architect and implement platform features.",
+      contributions: [
+        "Designed and implemented REST APIs using Flask",
+        "Built core business logic and data models using MongoDB",
+        "Led the backend engineering team",
+        "Planned API architecture",
+        "Worked closely with the founder to iterate and refine features",
+      ],
+      projectLink: "https://hive.innobee.buzz/login",
+    },
+    {
+      title: "Nobzo Website — Company Landing Platform",
+      role: "Frontend Engineer",
+      tech: ["Next.js", "TypeScript", "TailwindCSS"],
+      description:
+        "A modern, responsive website for Nobzoent, designed to present the company’s vision, services, and pre-launch product experience.",
+      contributions: [
+        "Built the full frontend with Next.js",
+        "Designed reusable UI components",
+        "Implemented SEO-optimized pages",
+        "Ensured smooth navigation and load performance",
+      ],
+      projectLink: "https://nobzoent.com/",
+    },
+    {
+      title: "Nobzo Admin Dashboard",
+      role: "Full-Stack Engineer",
+      tech: ["React", "TypeScript", "Node.js", "REST APIs"],
+      description:
+        "An internal admin system used to manage users, reports, analytics, and product operations.",
+      contributions: [
+        "Built major frontend modules using React",
+        "Wrote backend APIs used by the dashboard",
+        "Integrated the backend with React components",
+        "Implemented authentication, data tables, filters, and forms",
+        "Improved UI/UX for better admin flow",
+      ],
+    },
+    // {
+    //   title: "Crypto Trading Bot",
+    //   role: "Creator",
+    //   tech: ["Python", "Trading APIs", "Automation", "Algorithms"],
+    //   description:
+    //     "A Python-based automated crypto trading bot designed to analyze price movements and execute trades based on defined strategies.",
+    //   contributions: [
+    //     "Implemented trading strategy logic",
+    //     "Integrated exchange APIs",
+    //     "Built automated buy/sell triggers",
+    //     "Added logging and risk control features",
+    //   ],
+    //   github: "#",
+    //   githubFrontend: "#",
+    //   projectLink: "#",
+    // },
+    {
+      title: "CV Generator (Web App)",
+      role: "Full-Stack Engineer",
+      tech: ["Node.js", "TypeScript", "Express", "React"],
+      description:
+        "A web tool that helps users generate clean, professional CVs through a simple and interactive UI.",
+      contributions: [
+        "Built backend API with TypeScript + Express",
+        "Created client-side form builder with React",
+        "Added PDF export and template formatting",
+        "Implemented authentication and data storage",
+      ],
+      github: "https://github.com/EkeneDeProgram/CV-Generator",
+      githubFrontend: "https://github.com/EkeneDeProgram/cv-generator-frontend",
+      projectLink: "https://cv-generator-frontend-wey1.onrender.com/",
+    },
+    {
+      title: "Personal Portfolio",
+      role: "Creator",
+      tech: ["Next.js", "TailwindCSS"],
+      description:
+        "A professional portfolio built to showcase my engineering experience, projects, and skills.",
+      contributions: [
+        "Designed minimalist UI layout",
+        "Built responsive pages with clean sections",
+        "Optimized for SEO and fast loading",
+      ],
+      github: "https://github.com/EkeneDeProgram/cms",
+      githubFrontend: "https://github.com/EkeneDeProgram/portfolio",
+      projectLink: "#",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-white text-gray-900 px-4 sm:px-8 lg:px-24 py-12">
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-12">
