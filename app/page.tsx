@@ -30,7 +30,7 @@ export default function Home() {
           </a>
 
           <a
-            href="/Ekene-Onyekachi-CV.pdf"
+            href="/Ekene-full-stack-dev.pdf"
             download
             className="px-8 py-3 border border-black text-black font-semibold rounded-lg hover:bg-black hover:text-white transition"
           >

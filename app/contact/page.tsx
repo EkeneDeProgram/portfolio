@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     description:
       "Get in touch with me via my portfolio contact form.",
     type: "website",
-    url: "https://yourdomain.com/projects",
+    url: "https://portfolio-q8l2.onrender.com/contact",
     siteName: "Ekene Onyekachi Portfolio", 
     images: [
       {
-        url: "https://yourdomain.com/og-projects.png",
+        url: "https://portfolio-q8l2.onrender.com/ekene.png",
         width: 1200,
         height: 630,
         alt: "Projects by Ekene Onyekachi",
@@ -26,8 +26,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image", 
-    site: "@EkeneDeProgram",
-    creator: "@EkeneDeProgram", 
+    site: "@KukiWorldwide",
+    creator: "@KukiWorldwide", 
   },
 };
 

@@ -60,7 +60,7 @@ const ContactInfo: React.FC = () => {
           <div className="flex items-start gap-3 sm:gap-4">
             <FileText className="mt-1 h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0" />
             <a
-              href="/resume.pdf"
+              href="/Ekene-full-stack-dev.pdf"
               download
               className="hover:underline font-medium"
             >
